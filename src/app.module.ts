@@ -21,8 +21,7 @@ import { RepairDetailsModule } from './modules/repair-details/repair-details.mod
 
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) =>
-        config.get<any>('typeorm'),
+      useFactory: (config: ConfigService) => config.get<any>('typeorm'),
     }),
 
     UserModule,
