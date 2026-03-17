@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import typeOrmConfig from './config/database';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
@@ -13,24 +16,20 @@ import { RepairDetailsModule } from './modules/repair-details/repair-details.mod
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [typeOrmConfig],
     }),
-TypeOrmModule.forRootAsync({
-inject:[ConfigService],
-useFactory: (config: ConfigService)=> ({
-      type: 'postgres',
-      host: config.get('DB_HOST'),
-      port: config.get<number>('DB_PORT'),
-      username: config.get('DB_USERNAME'),
-      password: config.get('DB_PASSWORD'),
-      database: config.get('DB_DATABASE'),
-      autoLoadEntities: true,
-      synchronize: true,}),
-}),
-UserModule,
-AuthModule,
-RepairsModule,
-AddressModule,
-RepairDetailsModule
+
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        config.get<any>('typeorm'),
+    }),
+
+    UserModule,
+    AuthModule,
+    RepairsModule,
+    AddressModule,
+    RepairDetailsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
