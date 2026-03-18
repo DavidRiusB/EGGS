@@ -49,7 +49,7 @@ export class RegisterUserDTO {
   @IsNotEmpty({ message: 'Phone number is required' })
   @IsString()
   @MaxLength(10, { message: 'Telephone number must not exceed 10 digits' })
-  phone: string;
+  telephone: string;
 
   @IsOptional()
   @IsEnum(Role, { message: 'Invalid role value' })

@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credential } from './entities/auth.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
+import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class AuthRepository {
@@ -12,19 +13,24 @@ export class AuthRepository {
     private readonly userService: UserService,
   ) {}
 
-  async creatCredential(email: string, password: string): Promise<Credential> {
+  async create(
+    data: {
+      user: User;
+      email: string;
+      password: string;
+    },
+    manager?: EntityManager,
+  ): Promise<Credential> {
     try {
-      //const hashedPassword = await hashPassword(password)
-      const newCredential = new Credential();
-      newCredential.email = email;
-      newCredential.password = password; // for now since we dont have bycrip instaled
-      this.credentialRepository.create(newCredential);
-      return newCredential;
+      const repo = manager
+        ? manager.getRepository(Credential)
+        : this.credentialRepository;
+
+      const newCredential = repo.create(data);
+
+      return await repo.save(newCredential);
     } catch (error) {
       throw new BadRequestException(error);
     }
   }
-
-  async singIn() {}
-  async updatePassword() {}
 }

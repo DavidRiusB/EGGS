@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -6,10 +7,17 @@ import {
 import { UserRepository } from './user.repository';
 import { UserUpdateDto } from './user-update.dto';
 import { User } from './entity/user.entity';
+import { DataSource } from 'typeorm';
+import { AuthRepository } from '../auth/auth.repository';
+import { RegisterUserDTO } from '../auth/dto/register.dto';
+import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async findAll(pagination: { page: number; limit: number }) {
     return await this.userRepository.findAll(pagination);
