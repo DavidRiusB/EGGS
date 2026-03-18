@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
+import { Credential } from 'src/modules/auth/entities/auth.entity';
 import { User } from 'src/modules/user/entity/user.entity';
 import { DataSource } from 'typeorm';
 
@@ -19,6 +21,7 @@ export class SeedService {
   private async seedUsers(manager: any) {
     this.logger.log('Seeding users...');
     const userRepository = manager.getRepository(User);
+    const credentialRepository = manager.getRepository(Credential);
 
     const existingUsers = await userRepository.count();
     if (existingUsers > 0) {
@@ -26,6 +29,7 @@ export class SeedService {
       return;
     }
 
+    // 👉 Create user
     const user = userRepository.create({
       userName: 'testuser',
       firstName: 'Test',
@@ -34,10 +38,18 @@ export class SeedService {
       telephone: '123456789',
     });
 
-    await userRepository.save(user);
+    const savedUser = await userRepository.save(user);
 
-    // test query
-    await manager.query(`SELECT 1`);
+    const password = '12345678';
+    const hashedPassword = await hashPassword(password);
+
+    // 👉 Create credential linked to user
+    const credential = credentialRepository.create({
+      email: savedUser.email,
+      password: hashedPassword,
+      user: savedUser,
+    });
+    await credentialRepository.save(credential);
 
     this.logger.log('Users seed executed.');
   }
