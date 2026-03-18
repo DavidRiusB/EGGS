@@ -96,3 +96,72 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+---
+
+# 🤝 Collaboration Workflow
+
+### 1. Create a branch
+
+Use a descriptive name for your feature:
+
+```bash
+git checkout -b feature/feature-name
+```
+
+---
+
+### 2. Write your code
+
+Make your changes locally.
+
+---
+
+### 3. Commit and push
+
+```bash
+git add .
+git commit -m "feat: short description"
+git push origin feature/feature-name
+```
+
+---
+
+### 4. Open a Pull Request (PR)
+
+- Go to GitHub
+- Create a PR into `main`
+- Add a clear description of what you did
+
+---
+
+### 5. Wait for checks
+
+- CI must pass ✅
+- Review (if needed)
+
+---
+
+### 6. Merge
+
+- Once everything is OK → merge into `main`
+
+---
+
+# ⚠️ Rules
+
+- ❌ Do NOT push directly to `main`
+- ✅ Always use branches
+- ✅ Keep commits clear and small
+
+---
+
+# 🧠 Example branch names
+
+```text
+feature/user-crud
+fix/login-error
+chore/update-config
+```
+
+---
