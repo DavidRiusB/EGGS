@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { RegisterUserDTO } from '../auth/dto/register.dto';
 
 @Injectable()
@@ -54,5 +54,26 @@ export class UserRepository {
     return await this.userRepository.findOne({
       where: { telephone },
     });
+  }
+
+  async create(
+    newUserData: RegisterUserDTO,
+    manager?: EntityManager,
+  ): Promise<User> {
+    try {
+      const repo = manager ? manager.getRepository(User) : this.userRepository;
+      const { userName, firstName, lastName, email, telephone } = newUserData;
+
+      const newUser = repo.create({
+        userName,
+        firstName,
+        lastName,
+        email,
+        telephone,
+      });
+      return await repo.save(newUser);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
