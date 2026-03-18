@@ -16,6 +16,6 @@ export default registerAs(
 
     synchronize: true,
     logging: false,
-    dropSchema: false,
+    dropSchema: true,
   }),
 );
