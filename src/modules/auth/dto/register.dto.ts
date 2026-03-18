@@ -7,8 +7,9 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { Match } from 'src/common/deco/decorators/match.decorators';
-import { Role } from 'src/enums/roles.enum';
+import { Match } from 'src/common/decorators/match.decorator';
+
+import { Role } from 'src/common/enums/roles.enum';
 
 export class RegisterUserDTO {
   id?: number;

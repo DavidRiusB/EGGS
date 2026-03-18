@@ -12,15 +12,7 @@ export class Credential {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  // Optional depending on your use case
-  @Column({ unique: true, length: 20 })
-  SSN: string;
-
-  // 🔥 Username for login
-  @Column({ unique: true, length: 30 })
-  userName: string;
-
-  // 🔥 Used for login → MUST be selectable
+  // 🔥 Used for login
   @Column({ unique: true, length: 50 })
   email: string;
 
