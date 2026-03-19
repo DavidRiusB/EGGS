@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { EntityManager, Repository } from 'typeorm';
-import { RegisterUserDTO } from '../auth/dto/register.dto';
+import { RegisterUserDto } from '../auth/dto/register.dto';
 
 @Injectable()
 export class UserRepository {
@@ -57,7 +57,7 @@ export class UserRepository {
   }
 
   async create(
-    newUserData: RegisterUserDTO,
+    newUserData: RegisterUserDto,
     manager?: EntityManager,
   ): Promise<User> {
     try {

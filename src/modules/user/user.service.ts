@@ -8,9 +8,6 @@ import { UserRepository } from './user.repository';
 import { UserUpdateDto } from './user-update.dto';
 import { User } from './entity/user.entity';
 import { DataSource } from 'typeorm';
-import { AuthRepository } from '../auth/auth.repository';
-import { RegisterUserDTO } from '../auth/dto/register.dto';
-import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
 
 @Injectable()
 export class UserService {
