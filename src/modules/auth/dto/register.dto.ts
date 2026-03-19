@@ -11,7 +11,7 @@ import { Match } from 'src/common/decorators/match.decorator';
 
 import { Role } from 'src/common/enums/roles.enum';
 
-export class RegisterUserDTO {
+export class RegisterUserDto {
   id?: number;
 
   @IsNotEmpty({ message: 'Username is required' })
