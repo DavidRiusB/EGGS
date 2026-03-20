@@ -1,5 +1,16 @@
+import { AddressSuffix } from 'src/common/enums/address-suffixes.enum';
+import { CardinalDirection } from 'src/common/enums/cardinal-directions.enum';
+import { State } from 'src/common/enums/states.enums';
 import { User } from 'src/modules/user/entity/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 interface Location {
   lat: number;
@@ -11,18 +22,45 @@ export class Address {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'int' })
+  number: number;
+
+  @Column({ type: 'enum', enum: CardinalDirection, nullable: true })
+  cardinalDirection?: CardinalDirection;
+
   @Column()
-  address: string;
+  streetName: string;
 
-  @Column({ type: 'jsonb' })
-  location: Location;
+  @Column({ type: 'enum', enum: AddressSuffix })
+  suffix: AddressSuffix;
 
-  @Column({
-    nullable: true,
-    length: 500,
+  @Column()
+  city: string;
+
+  @Column({ type: 'enum', enum: State })
+  state: State;
+
+  @Column({ length: 10 })
+  zipCode: string;
+
+  @Column({ type: 'jsonb', nullable: true }) // or 'simple-json'
+  location?: Location;
+
+  @Column({ nullable: true, length: 500 })
+  notes?: string;
+
+  @Column({ type: 'boolean', default: false })
+  isPrimary: boolean;
+
+  @Index()
+  @ManyToOne(() => User, (user) => user.addresses, {
+    onDelete: 'CASCADE',
   })
-  notes: string;
-
-  @ManyToOne(() => User, (user) => user.addresses)
   user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
