@@ -7,7 +7,7 @@ import { AddressRepository } from './address.repository';
 import { Address } from './entity/address.entity';
 import { AddressDto } from './dto/address.dto';
 import { UserRepository } from '../user/user.repository';
-import { DataSource } from 'typeorm/browser';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AddressService {

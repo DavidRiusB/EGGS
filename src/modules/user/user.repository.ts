@@ -5,9 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { DeleteResult, EntityManager, Repository } from 'typeorm';
 import { RegisterUserDto } from '../auth/dto/register.dto';
-import { DeleteResult } from 'typeorm/browser';
 
 @Injectable()
 export class UserRepository {
