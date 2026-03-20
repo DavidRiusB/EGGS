@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credential } from './entities/auth.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -32,5 +36,13 @@ export class AuthRepository {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async findByEmail(email: string): Promise<Credential | null> {
+    return await this.credentialRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password'],
+      relations: ['user'],
+    });
   }
 }

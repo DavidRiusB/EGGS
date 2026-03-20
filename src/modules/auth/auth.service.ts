@@ -1,9 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { AuthRepository } from './auth.repository';
 import { UserRepository } from '../user/user.repository';
 import { RegisterUserDto } from './dto/register.dto';
-import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
+import {
+  hashPassword,
+  validateUserPassword,
+} from 'src/common/utils/hashing/bycryp.utils';
+
+import { LoginUserDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,5 +43,26 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+
+  async signIn(credentials: LoginUserDto) {
+    const { email, password } = credentials;
+
+    const credential = await this.authRepository.findByEmail(email);
+
+    if (!credential) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isValidPassword = await validateUserPassword(
+      password,
+      credential.password,
+    );
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return credential.user;
   }
 }
