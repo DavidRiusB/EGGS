@@ -47,9 +47,7 @@ export class UserRepository {
       return await this.userRepository.save(user);
     } catch (error) {
       if (error.code === '23505') {
-        throw new BadRequestException(
-          'User with provided data already exists',
-        );
+        throw new BadRequestException('User with provided data already exists');
       }
 
       throw new InternalServerErrorException(
@@ -78,9 +76,7 @@ export class UserRepository {
       return await repo.save(newUser);
     } catch (error) {
       if (error.code === '23505') {
-        throw new BadRequestException(
-          'User with provided data already exists',
-        );
+        throw new BadRequestException('User with provided data already exists');
       }
 
       throw new InternalServerErrorException('Error creating user');
