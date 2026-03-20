@@ -1,0 +1,15 @@
+export enum AddressSuffix {
+  STREET = 'St',
+  ROAD = 'Rd',
+  AVENUE = 'Ave',
+  LANE = 'Ln',
+  DRIVE = 'Dr',
+  BOULEVARD = 'Blvd',
+  COURT = 'Ct',
+  PLACE = 'Pl',
+  WAY = 'Way',
+  CRESCENT = 'Cres',
+  TERRACE = 'Ter',
+  CIRCLE = 'Cir',
+  TRAIL = 'Trl',
+}

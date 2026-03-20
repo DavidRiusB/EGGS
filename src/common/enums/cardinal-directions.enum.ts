@@ -1,0 +1,10 @@
+export enum CardinalDirection {
+  NORTH = 'NORTH',
+  SOUTH = 'SOUTH',
+  EAST = 'EAST',
+  WEST = 'WEST',
+  NORTHEAST = 'NORTHEAST',
+  NORTHWEST = 'NORTHWEST',
+  SOUTHEAST = 'SOUTHEAST',
+  SOUTHWEST = 'SOUTHWEST',
+}
