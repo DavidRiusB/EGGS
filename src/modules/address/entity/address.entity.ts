@@ -1,6 +1,8 @@
 import { AddressSuffix } from 'src/common/enums/address-suffixes.enum';
 import { CardinalDirection } from 'src/common/enums/cardinal-directions.enum';
 import { State } from 'src/common/enums/states.enums';
+import { Location } from 'src/common/interfaces/location.interface';
+
 import { User } from 'src/modules/user/entity/user.entity';
 import {
   Column,
@@ -11,11 +13,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-interface Location {
-  lat: number;
-  lng: number;
-}
 
 @Entity({ name: 'addresses' })
 export class Address {
@@ -42,9 +39,6 @@ export class Address {
 
   @Column({ length: 10 })
   zipCode: string;
-
-  @Column({ type: 'jsonb', nullable: true }) // or 'simple-json'
-  location?: Location;
 
   @Column({ nullable: true, length: 500 })
   notes?: string;

@@ -31,8 +31,9 @@ export class UserRepository {
     return { data, total };
   }
 
-  async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id } });
+  async findById(id: number, manager?: EntityManager): Promise<User | null> {
+    const repo = manager ? manager.getRepository(User) : this.userRepository;
+    return repo.findOne({ where: { id } });
   }
 
   async findByEmail(email: string): Promise<User | null> {
