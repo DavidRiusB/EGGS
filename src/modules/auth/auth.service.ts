@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { AuthRepository } from './auth.repository';
 import { UserRepository } from '../user/user.repository';
-import { RegisterUserDTO } from './dto/register.dto';
+import { RegisterUserDto } from './dto/register.dto';
 import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async register(data: RegisterUserDTO) {
+  async register(data: RegisterUserDto) {
     try {
       return await this.dataSource.transaction(async (manager) => {
         // 🔐 1. hash password

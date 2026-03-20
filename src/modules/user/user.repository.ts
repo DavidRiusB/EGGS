@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { EntityManager, Repository } from 'typeorm';
-import { RegisterUserDTO } from '../auth/dto/register.dto';
+import { EntityManager, Repository, DeleteResult } from 'typeorm';
+import { RegisterUserDto } from '../auth/dto/register.dto';
 
 @Injectable()
 export class UserRepository {
@@ -15,19 +15,31 @@ export class UserRepository {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findAll(pagination: { page: number; limit: number }) {
+  async findAll(pagination: {
+    page: number;
+    limit: number;
+  }): Promise<{ data: User[]; total: number }> {
     const { page, limit } = pagination;
     const offset = (page - 1) * limit;
+
     const [data, total] = await this.userRepository.findAndCount({
       skip: offset,
       take: limit,
     });
+
     return { data, total };
   }
 
-  async findById(id: number) {
-    const user = await this.userRepository.findOne({ where: { id } });
-    return user;
+  async findById(id: number): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
+  }
+
+  async findByTelephone(telephone: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { telephone } });
   }
 
   async update(user: User): Promise<User> {
@@ -35,7 +47,9 @@ export class UserRepository {
       return await this.userRepository.save(user);
     } catch (error) {
       if (error.code === '23505') {
-        throw new BadRequestException('User with provided data already exists');
+        throw new BadRequestException(
+          'User with provided data already exists',
+        );
       }
 
       throw new InternalServerErrorException(
@@ -44,24 +58,13 @@ export class UserRepository {
     }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: { email },
-    });
-  }
-
-  async findByTelephone(telephone: string): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: { telephone },
-    });
-  }
-
   async create(
-    newUserData: RegisterUserDTO,
+    newUserData: RegisterUserDto,
     manager?: EntityManager,
   ): Promise<User> {
     try {
       const repo = manager ? manager.getRepository(User) : this.userRepository;
+
       const { userName, firstName, lastName, email, telephone } = newUserData;
 
       const newUser = repo.create({
@@ -71,9 +74,20 @@ export class UserRepository {
         email,
         telephone,
       });
+
       return await repo.save(newUser);
     } catch (error) {
-      throw new BadRequestException(error);
+      if (error.code === '23505') {
+        throw new BadRequestException(
+          'User with provided data already exists',
+        );
+      }
+
+      throw new InternalServerErrorException('Error creating user');
     }
+  }
+
+  async softDelete(id: number): Promise<DeleteResult> {
+    return this.userRepository.softDelete(id);
   }
 }
