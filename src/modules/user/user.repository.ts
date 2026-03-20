@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { EntityManager, Repository, DeleteResult } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { RegisterUserDto } from '../auth/dto/register.dto';
 
 @Injectable()
