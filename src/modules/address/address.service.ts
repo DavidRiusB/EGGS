@@ -8,6 +8,7 @@ import { Address } from './entity/address.entity';
 import { AddressDto } from './dto/address.dto';
 import { UserRepository } from '../user/user.repository';
 import { DataSource } from 'typeorm';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Injectable()
 export class AddressService {
@@ -56,6 +57,60 @@ export class AddressService {
       throw new InternalServerErrorException(
         'Unexpected error while creating address',
       );
+    }
+  }
+
+  async updateAddress(id: number, data: UpdateAddressDto) {
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        // find ADDRESS
+        const address = await this.addressRepository.findById(id, manager);
+
+        if (!address) {
+          throw new NotFoundException(`Address with id ${id} not found`);
+        }
+
+        const user = address.user;
+
+        if (!user) {
+          throw new InternalServerErrorException(
+            'Address is missing associated user',
+          );
+        }
+
+        // enforce primary rules ONLY if field is present
+        if (data.isPrimary !== undefined) {
+          if (data.isPrimary) {
+            await this.addressRepository.clearPrimaryForUser(user.id, manager);
+          } else {
+            const hasPrimary = await this.addressRepository.hasPrimary(
+              user.id,
+              manager,
+            );
+
+            if (!hasPrimary) {
+              data.isPrimary = true;
+            }
+          }
+        }
+
+        // patch
+        return await this.addressRepository.patch(address, data, manager);
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+
+      throw new InternalServerErrorException(
+        'Unexpected error while updating address',
+      );
+    }
+  }
+
+  async softDelete(id: number): Promise<void> {
+    const result = await this.addressRepository.softDelete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Address with id ${id} not found`);
     }
   }
 }
