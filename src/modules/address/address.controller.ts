@@ -1,19 +1,22 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AddressDto } from './dto/address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
-  @Get()
+  @Get('all')
   async getAllAddresses() {
     return this.addressService.findAll();
   }
@@ -29,5 +32,19 @@ export class AddressController {
     @Body() data: AddressDto,
   ) {
     return await this.addressService.createAddress(data, id);
+  }
+
+  @Patch('/update')
+  async updateAddress(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateAddressDto,
+  ) {
+    return this.addressService.updateAddress(id, data);
+  }
+
+  @Delete(':id')
+  async deleteAddress(@Param('id', ParseIntPipe) id: number) {
+    await this.addressService.softDelete(id);
+    return { message: 'Address deleted successfully' };
   }
 }

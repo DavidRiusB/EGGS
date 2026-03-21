@@ -1,21 +1,23 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { AddressDto } from './address.dto';
 import {
   IsBoolean,
   IsEnum,
-  IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
+  IsNumber,
+  IsPostalCode,
 } from 'class-validator';
 import { CardinalDirection } from 'src/common/enums/cardinal-directions.enum';
 import { AddressSuffix } from 'src/common/enums/address-suffixes.enum';
 import { State } from 'src/common/enums/states.enums';
 
-export class AddressDto {
-  @IsNotEmpty({ message: 'Address number is required' })
+export class UpdateAddressDto extends PartialType(AddressDto) {
+  @IsOptional()
   @IsNumber({}, { message: 'Address number must be a valid number' })
-  number: number;
+  number?: number;
 
   @IsOptional()
   @IsEnum(CardinalDirection, {
@@ -23,33 +25,33 @@ export class AddressDto {
   })
   cardinalDirection?: CardinalDirection;
 
-  @IsNotEmpty({ message: 'Street name is required' })
+  @IsOptional()
   @IsString({ message: 'Street name must be a string' })
   @MaxLength(100, {
     message: 'Street name must not exceed 100 characters',
   })
-  streetName: string;
+  streetName?: string;
 
-  @IsNotEmpty({ message: 'Address suffix is required' })
+  @IsOptional()
   @IsEnum(AddressSuffix, {
     message: 'Invalid address suffix',
   })
-  suffix: AddressSuffix;
+  suffix?: AddressSuffix;
 
-  @IsNotEmpty({ message: 'City is required' })
+  @IsOptional()
   @IsString({ message: 'City must be a string' })
   @MaxLength(100, {
     message: 'City must not exceed 100 characters',
   })
-  city: string;
+  city?: string;
 
-  @IsNotEmpty({ message: 'State is required' })
+  @IsOptional()
   @IsEnum(State, {
     message: 'Invalid state value',
   })
-  state: State;
+  state?: State;
 
-  @IsNotEmpty({ message: 'Zip code is required' })
+  @IsOptional()
   @IsString({ message: 'Zip code must be a string' })
   @MinLength(5, {
     message: 'Zip code must be at least 5 characters',
@@ -57,7 +59,7 @@ export class AddressDto {
   @MaxLength(10, {
     message: 'Zip code must not exceed 10 characters',
   })
-  zipCode: string;
+  zipCode?: string;
 
   @IsOptional()
   @IsString({ message: 'Notes must be a string' })
