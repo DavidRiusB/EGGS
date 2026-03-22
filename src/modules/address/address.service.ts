@@ -21,6 +21,7 @@ export class AddressService {
   async findAll(): Promise<Address[]> {
     return this.addressRepository.findAllAddresses();
   }
+
   async findUserAddresses(id: number): Promise<Address[] | Error> {
     return await this.addressRepository.getUserAddresses(id);
   }

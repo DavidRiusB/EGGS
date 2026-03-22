@@ -29,7 +29,6 @@ import { SeedModule } from './seed/seed.module';
     AuthModule,
     RepairsModule,
     AddressModule,
-    RepairDetailsModule,
     SeedModule,
   ],
   controllers: [AppController],
