@@ -63,7 +63,6 @@ export class AddressService {
   async updateAddress(id: number, data: UpdateAddressDto) {
     try {
       return await this.dataSource.transaction(async (manager) => {
-        // find ADDRESS
         const address = await this.addressRepository.findById(id, manager);
 
         if (!address) {
@@ -78,23 +77,13 @@ export class AddressService {
           );
         }
 
-        // enforce primary rules ONLY if field is present
-        if (data.isPrimary !== undefined) {
-          if (data.isPrimary) {
-            await this.addressRepository.clearPrimaryForUser(user.id, manager);
-          } else {
-            const hasPrimary = await this.addressRepository.hasPrimary(
-              user.id,
-              manager,
-            );
-
-            if (!hasPrimary) {
-              data.isPrimary = true;
-            }
-          }
+        // enforce primary rules
+        if (data.isPrimary === true) {
+          await this.addressRepository.clearPrimaryForUser(user.id, manager);
+        } else if (data.isPrimary === false) {
+          delete data.isPrimary;
         }
 
-        // patch
         return await this.addressRepository.patch(address, data, manager);
       });
     } catch (error) {
