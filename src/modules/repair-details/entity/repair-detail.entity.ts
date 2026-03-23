@@ -16,7 +16,7 @@ export class RepairDetail {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 150, unique: true })
+  @Column({ length: 150 })
   name: string;
 
   @Column({ length: 500 })
@@ -32,13 +32,11 @@ export class RepairDetail {
   @Column({ default: 1 })
   quantity: number;
 
-  @Column({
-    type: 'decimal',
-    precision: 5,
-    scale: 2,
-    nullable: true,
-  })
-  hours?: string;
+  @Column({ default: false })
+  isTimeBased: boolean;
+
+  @Column({ type: 'enum', enum: RepairDetailType })
+  type: RepairDetailType;
 
   @Column({
     type: 'decimal',
@@ -48,11 +46,11 @@ export class RepairDetail {
   price: string;
 
   @Column({
-    type: 'enum',
-    enum: RepairDetailType,
-    default: RepairDetailType.OTHER,
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
   })
-  type: RepairDetailType;
+  total: string;
 
   @CreateDateColumn()
   createdAt: Date;

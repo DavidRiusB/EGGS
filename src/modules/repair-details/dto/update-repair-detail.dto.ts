@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -30,16 +31,14 @@ export class UpdateRepairDetailDto {
   quantity?: number;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber({}, { message: 'Hours must be a number' })
-  @Min(0, { message: 'Hours cannot be negative' })
-  hours?: number;
+  @IsBoolean({ message: 'isTimeBased must be true or false' })
+  isTimeBased?: boolean;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Price must be a number' })
   @Min(0, { message: 'Price cannot be negative' })
-  price: number;
+  price?: number;
 
   @IsOptional()
   @IsEnum(RepairDetailType, {

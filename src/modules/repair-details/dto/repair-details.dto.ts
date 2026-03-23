@@ -6,7 +6,8 @@ import {
   Min,
   IsOptional,
   IsEnum,
-  IsPositive,
+  IsBoolean,
+  IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RepairDetailType } from 'src/common/enums/repair-detail-type.enum';
@@ -24,17 +25,15 @@ export class CreateRepairDetailDto {
   })
   description: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => Number)
-  @IsNumber({}, { message: 'Quantity must be a number' })
-  @IsPositive({ message: 'Quantity must be greater than 0' })
-  quantity?: number;
+  @IsInt({ message: 'Quantity must be an integer' })
+  @Min(1, { message: 'Quantity must be at least 1' })
+  quantity: number;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber({}, { message: 'Hours must be a number' })
-  @Min(0, { message: 'Hours cannot be negative' })
-  hours?: number;
+  @IsBoolean({ message: 'isTimeBased must be true or false' })
+  isTimeBased?: boolean;
 
   @IsNotEmpty({ message: 'Price is required' })
   @Type(() => Number)
@@ -42,9 +41,9 @@ export class CreateRepairDetailDto {
   @Min(0, { message: 'Price cannot be negative' })
   price: number;
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'Type is required' })
   @IsEnum(RepairDetailType, {
     message: 'Type must be one of: material, labor, part, fee, or other',
   })
-  type?: RepairDetailType;
+  type: RepairDetailType;
 }

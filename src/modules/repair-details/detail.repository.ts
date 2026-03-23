@@ -7,11 +7,8 @@ import { CreateRepairDetailDto } from './dto/repair-details.dto';
 import { UpdateRepairDetailDto } from './dto/update-repair-detail.dto';
 
 @Injectable()
-export class RepairDetailRepository {
-  constructor(
-    @InjectRepository(RepairDetail)
-    private readonly repairDetailRepository: Repository<RepairDetail>,
-  ) {}
+export class pepito {
+  constructor(private readonly repairDetailRepository) {}
 
   private getRepo(manager?: EntityManager): Repository<RepairDetail> {
     return manager
@@ -45,7 +42,7 @@ export class RepairDetailRepository {
     });
   }
 
-  async create(data: CreateRepairDetailDto): Promise<RepairDetail> {
+  async create(data) {
     const newDetail = this.repairDetailRepository.create({
       ...data,
       price: data.price.toFixed(2),
@@ -55,10 +52,7 @@ export class RepairDetailRepository {
     return this.repairDetailRepository.save(newDetail);
   }
 
-  async patch(
-    detail: RepairDetail,
-    data: UpdateRepairDetailDto,
-  ): Promise<RepairDetail> {
+  async patch(detail, data): Promise<RepairDetail> {
     const newDetail = this.repairDetailRepository.merge(detail, {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.description !== undefined && {
