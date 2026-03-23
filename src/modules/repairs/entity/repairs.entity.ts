@@ -1,3 +1,5 @@
+import { PaymentMethod } from 'src/common/enums/payment-method.enum';
+import { RepairStatus } from 'src/common/enums/repair-status.enum';
 import { Address } from 'src/modules/address/entity/address.entity';
 import { RepairDetail } from 'src/modules/repair-details/entity/repair-detail.entity';
 import { User } from 'src/modules/user/entity/user.entity';
@@ -29,16 +31,18 @@ export class Repair {
   details: RepairDetail[];
 
   @Column({
-    default: 'pending',
+    type: 'enum',
+    enum: RepairStatus,
+    default: RepairStatus.PENDING,
   })
-  status: string;
+  status: RepairStatus;
 
   @Column({
     type: 'decimal',
     precision: 10,
     scale: 2,
   })
-  price: number;
+  price: string;
 
   @Column({
     nullable: true,
@@ -51,10 +55,13 @@ export class Repair {
     scale: 2,
     nullable: true,
   })
-  couponDiscount?: number;
+  discountAmount?: string;
 
-  @Column()
-  paymentMethod: string;
+  @Column({
+    type: 'enum',
+    enum: PaymentMethod,
+  })
+  paymentMethod: PaymentMethod;
 
   @ManyToOne(() => Address)
   address: Address;
