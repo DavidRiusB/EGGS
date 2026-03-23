@@ -43,6 +43,14 @@ export class UserRepository {
     return this.userRepository.findOne({ where: { telephone } });
   }
 
+  async findByIdWithPrimaryAddress(id: number, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(User) : this.userRepository;
+    return repo.findOne({
+      where: { id, addresses: { isPrimary: true } },
+      relations: ['addresses'],
+    });
+  }
+
   async update(user: User): Promise<User> {
     try {
       return await this.userRepository.save(user);
