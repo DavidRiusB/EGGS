@@ -1,49 +1,43 @@
+import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
-  IsNotEmpty,
+  IsBoolean,
+  IsEnum,
+  IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
-  IsNumber,
   Min,
-  IsOptional,
-  IsEnum,
-  IsBoolean,
-  IsInt,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ProductType } from 'src/common/enums/product-type.enum';
+import { Product } from '../entity/products.entity';
 
-export class CreateRepairDetailDto {
-  @IsNotEmpty({ message: 'Name is required' })
+export class UpdateProductDto {
+  @IsOptional()
   @IsString({ message: 'Name must be a string' })
   @MaxLength(150, { message: 'Name must not exceed 150 characters' })
-  name: string;
+  name?: string;
 
-  @IsNotEmpty({ message: 'Description is required' })
+  @IsOptional()
   @IsString({ message: 'Description must be a string' })
   @MaxLength(500, {
     message: 'Description must not exceed 500 characters',
   })
-  description: string;
-
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsInt({ message: 'Quantity must be an integer' })
-  @Min(1, { message: 'Quantity must be at least 1' })
-  quantity: number;
+  description?: string;
 
   @IsOptional()
   @IsBoolean({ message: 'isTimeBased must be true or false' })
   isTimeBased?: boolean;
 
-  @IsNotEmpty({ message: 'Price is required' })
+  @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Price must be a number' })
   @Min(0, { message: 'Price cannot be negative' })
-  price: number;
+  price?: number;
 
-  @IsNotEmpty({ message: 'Type is required' })
+  @IsOptional()
   @IsEnum(ProductType, {
     message: 'Type must be one of: material, labor, part, fee, or other',
   })
-  type: ProductType;
+  type?: ProductType;
 }

@@ -1,4 +1,4 @@
-import { RepairDetailType } from 'src/common/enums/repair-detail-type.enum';
+import { ProductType } from 'src/common/enums/product-type.enum';
 import { Repair } from 'src/modules/repairs/entity/repairs.entity';
 import {
   Column,
@@ -35,8 +35,8 @@ export class RepairDetail {
   @Column({ default: false })
   isTimeBased: boolean;
 
-  @Column({ type: 'enum', enum: RepairDetailType })
-  type: RepairDetailType;
+  @Column({ type: 'enum', enum: ProductType })
+  type: ProductType;
 
   @Column({
     type: 'decimal',

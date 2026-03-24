@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RepairDetail } from './entity/repair-detail.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
-import { RepairDetailType } from 'src/common/enums/repair-detail-type.enum';
+
 import { CreateRepairDetailDto } from './dto/repair-details.dto';
 import { UpdateRepairDetailDto } from './dto/update-repair-detail.dto';
 
@@ -20,7 +20,7 @@ export class pepito {
     return this.repairDetailRepository.find();
   }
 
-  async findAllByType(type: RepairDetailType): Promise<RepairDetail[]> {
+  async findAllByType(type): Promise<RepairDetail[]> {
     return this.repairDetailRepository.find({ where: { type } });
   }
 
