@@ -1,17 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RepairRepository } from './repairs.repository';
-import { DataSource } from 'typeorm';
 import { Repair } from './entity/repairs.entity';
-import { CreateRepairDto } from './dto/create-repair.dto';
-import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class RepairsService {
-  constructor(
-    private readonly repairRepository: RepairRepository,
-    private readonly userRepository: UserRepository,
-    private readonly dataSource: DataSource,
-  ) {}
+  constructor(private readonly repairRepository: RepairRepository) {}
 
   async findAll(): Promise<Repair[]> {
     return this.repairRepository.findAll();
@@ -29,23 +22,7 @@ export class RepairsService {
     return repair;
   }
 
-  async createRepair(data: CreateRepairDto) {
-    const { userId, details } = data;
-    try {
-      return await this.dataSource.transaction(async (manager) => {
-        // find user
-        const user = await this.userRepository.findByIdWithPrimaryAddress(
-          userId,
-          manager,
-        );
-        if (!user) {
-          throw new NotFoundException(`User with Id ${userId} not found`);
-        }
-
-        // find details
-      });
-    } catch (error) {}
-  }
+  async createRepair(data) {}
 
   async softDelete(id: number): Promise<void> {
     const result = await this.repairRepository.softDelete(id);

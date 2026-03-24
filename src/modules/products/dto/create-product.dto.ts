@@ -1,18 +1,17 @@
+import { Type } from 'class-transformer';
 import {
+  IsBoolean,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
-  IsNumber,
   Min,
-  IsOptional,
-  IsEnum,
-  IsBoolean,
-  IsInt,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ProductType } from 'src/common/enums/product-type.enum';
 
-export class CreateRepairDetailDto {
+export class CreateProductDto {
   @IsNotEmpty({ message: 'Name is required' })
   @IsString({ message: 'Name must be a string' })
   @MaxLength(150, { message: 'Name must not exceed 150 characters' })
@@ -24,12 +23,6 @@ export class CreateRepairDetailDto {
     message: 'Description must not exceed 500 characters',
   })
   description: string;
-
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsInt({ message: 'Quantity must be an integer' })
-  @Min(1, { message: 'Quantity must be at least 1' })
-  quantity: number;
 
   @IsOptional()
   @IsBoolean({ message: 'isTimeBased must be true or false' })

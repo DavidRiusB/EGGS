@@ -9,7 +9,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { RepairDetailType } from 'src/common/enums/repair-detail-type.enum';
+import { ProductType } from 'src/common/enums/product-type.enum';
 
 export class UpdateRepairDetailDto {
   @IsOptional()
@@ -41,8 +41,8 @@ export class UpdateRepairDetailDto {
   price?: number;
 
   @IsOptional()
-  @IsEnum(RepairDetailType, {
+  @IsEnum(ProductType, {
     message: 'Type must be one of: material, labor, part, fee, or other',
   })
-  type?: RepairDetailType;
+  type?: ProductType;
 }

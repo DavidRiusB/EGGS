@@ -1,4 +1,4 @@
-export enum RepairDetailType {
+export enum ProductType {
   MATERIAL = 'material',
   LABOR = 'labor',
   PART = 'part',
