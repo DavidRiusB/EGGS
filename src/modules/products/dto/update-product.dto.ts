@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
@@ -10,7 +9,6 @@ import {
   Min,
 } from 'class-validator';
 import { ProductType } from 'src/common/enums/product-type.enum';
-import { Product } from '../entity/products.entity';
 
 export class UpdateProductDto {
   @IsOptional()
