@@ -43,12 +43,20 @@ export class UserRepository {
     return this.userRepository.findOne({ where: { telephone } });
   }
 
-  async findByIdWithPrimaryAddress(id: number, manager?: EntityManager) {
+  async findByIdWithPrimaryAddress(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<User | null> {
     const repo = manager ? manager.getRepository(User) : this.userRepository;
-    return repo.findOne({
-      where: { id, addresses: { isPrimary: true } },
-      relations: ['addresses'],
-    });
+    return repo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect(
+        'user.addresses',
+        'address',
+        'address.isPrimary = true',
+      )
+      .where('user.id =:id', { id })
+      .getOne();
   }
 
   async update(user: User): Promise<User> {
