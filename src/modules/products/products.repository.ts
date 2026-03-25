@@ -6,6 +6,7 @@ import {
   DeepPartial,
   DeleteResult,
   EntityManager,
+  In,
   Repository,
 } from 'typeorm';
 import { ProductType } from 'src/common/enums/product-type.enum';
@@ -17,7 +18,6 @@ export class ProductsRepository {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    private readonly dataSource: DataSource,
   ) {}
 
   private getRepo(manager?: EntityManager): Repository<Product> {
@@ -61,6 +61,17 @@ export class ProductsRepository {
 
   async findByName(name: string): Promise<Product | null> {
     return this.productRepository.findOne({ where: { name } });
+  }
+
+  async findProductsByIdInBulk(
+    ids: number[],
+    manager: EntityManager,
+  ): Promise<Product[]> {
+    const repo = this.getRepo(manager);
+
+    return repo.findBy({
+      id: In(ids),
+    });
   }
 
   async softDelete(id: number): Promise<DeleteResult> {
