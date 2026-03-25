@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
-import { CreateRepairDetailRefDto } from 'src/modules/repair-details/dto/detail-ref.dto';
+import { ProductRefDto } from 'src/modules/products/dto/product-ref.dto';
 
 export class CreateRepairDto {
   @IsNotEmpty({ message: 'User ID is required' })
@@ -9,6 +9,6 @@ export class CreateRepairDto {
 
   @IsArray({ message: 'Details must be an array' })
   @ValidateNested({ each: true })
-  @Type(() => CreateRepairDetailRefDto)
-  details: CreateRepairDetailRefDto[];
+  @Type(() => ProductRefDto)
+  items: ProductRefDto[];
 }
