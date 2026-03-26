@@ -5,6 +5,7 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'credentials' })
@@ -32,4 +33,7 @@ export class Credential {
   })
   @JoinColumn()
   user: User;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }

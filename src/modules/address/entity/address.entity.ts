@@ -12,6 +12,7 @@ import {
   Index,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'addresses' })
@@ -57,4 +58,7 @@ export class Address {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }

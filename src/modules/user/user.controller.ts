@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Put,
   Query,
 } from '@nestjs/common';
@@ -38,7 +39,7 @@ export class UserController {
     return this.userService.findUserById(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
     @Body() userData: UserUpdateDto,

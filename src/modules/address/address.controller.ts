@@ -16,6 +16,7 @@ import { UpdateAddressDto } from './dto/update-address.dto';
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  // usless
   @Get('all')
   async getAllAddresses() {
     return this.addressService.findAll();
@@ -34,7 +35,7 @@ export class AddressController {
     return await this.addressService.createAddress(data, id);
   }
 
-  @Patch('/update')
+  @Patch('/update/:id')
   async updateAddress(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateAddressDto,
