@@ -29,7 +29,7 @@ export class RepairsController {
   async getById(@Param('id', ParseIntPipe) id: number) {
     return this.repairService.findById(id);
   }
-
+// bugs entity requierments not fullfilled 
   @Post()
   async createRepair(@Body() data: CreateRepairDto) {
     return this.repairService.createRepair(data);

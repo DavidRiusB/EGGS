@@ -37,7 +37,7 @@ export class RepairsService {
   }
 
   async createRepair(data: CreateRepairDto) {
-    const { userId, items } = data;
+    const { userId, items, paymentMethod } = data;
     return this.dataSource.transaction(async (manager) => {
       const user = await this.userRepository.findByIdWithPrimaryAddress(
         userId,
@@ -73,6 +73,7 @@ export class RepairsService {
 
         return {
           name: product.name,
+          type: product.type,
           description: product.description,
           quantity,
           isTimeBased: product.isTimeBased,
@@ -90,6 +91,7 @@ export class RepairsService {
         address: primaryAddress,
         status: RepairStatus.COMPLETED,
         price: totalPrice,
+        paymentMethod,
         details,
       });
       return await manager.save(repair);
