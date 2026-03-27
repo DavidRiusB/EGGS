@@ -65,7 +65,7 @@ export class ProductsRepository {
 
   async findProductsByIdInBulk(
     ids: number[],
-    manager: EntityManager,
+    manager?: EntityManager,
   ): Promise<Product[]> {
     const repo = this.getRepo(manager);
 
@@ -74,7 +74,7 @@ export class ProductsRepository {
     });
   }
 
-  async softDelete(id: number): Promise<DeleteResult> {
+  async softDelete(id: number, manager?: EntityManager): Promise<DeleteResult> {
     return this.productRepository.softDelete(id);
   }
 }

@@ -10,5 +10,6 @@ import { UserModule } from '../user/user.module';
   imports: [TypeOrmModule.forFeature([Address]), UserModule],
   providers: [AddressService, AddressRepository],
   controllers: [AddressController],
+  exports: [AddressRepository],
 })
 export class AddressModule {}

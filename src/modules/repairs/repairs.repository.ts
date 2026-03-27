@@ -25,18 +25,18 @@ export class RepairRepository {
     });
   }
 
-  async findById(id: number): Promise<Repair | null> {
-    return this.repairRepository.findOne({
+  async findById(id: number, manager?: EntityManager): Promise<Repair | null> {
+    const repo = this.getRepo(manager);
+    return repo.findOne({
       where: { id },
       relations: ['details', 'user', 'address'],
     });
   }
 
-  // create
-
   // patch
 
-  async softDelete(id: number): Promise<DeleteResult> {
-    return this.repairRepository.softDelete({ id });
+  async softDelete(id: number, manager?: EntityManager): Promise<DeleteResult> {
+    const repo = this.getRepo(manager);
+    return repo.softDelete({ id });
   }
 }
