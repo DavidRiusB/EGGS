@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from './entity/appointment.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
-import { DataSource } from 'typeorm/browser';
 import { FindAppointmentsDto } from './dto/find-appointments.dto';
 import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
 
@@ -11,7 +10,6 @@ export class AppointmentsRepository {
   constructor(
     @InjectRepository(Appointment)
     private readonly appointmentsRepository: Repository<Appointment>,
-    private readonly dataSource: DataSource,
   ) {}
 
   private getRepo(manager): Repository<Appointment> {

@@ -17,5 +17,6 @@ import { AddressModule } from '../address/address.module';
   ],
   controllers: [RepairsController],
   providers: [RepairsService, RepairRepository],
+  exports: [RepairRepository],
 })
 export class RepairsModule {}
