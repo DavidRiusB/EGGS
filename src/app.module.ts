@@ -10,6 +10,7 @@ import { RepairsModule } from './modules/repairs/repairs.module';
 import { AddressModule } from './modules/address/address.module';
 import { SeedModule } from './seed/seed.module';
 import { ProductsModule } from './modules/products/products.module';
+import { AppointmentsModule } from './modules/appointments/appointments.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ProductsModule } from './modules/products/products.module';
     AddressModule,
     SeedModule,
     ProductsModule,
+    AppointmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

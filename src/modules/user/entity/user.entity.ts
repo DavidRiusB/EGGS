@@ -12,6 +12,7 @@ import {
 import { Address } from 'src/modules/address/entity/address.entity';
 import { Repair } from 'src/modules/repairs/entity/repairs.entity';
 import { Credential } from 'src/modules/auth/entities/auth.entity';
+import { Appointment } from 'src/modules/appointments/entity/appointment.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -42,6 +43,9 @@ export class User {
 
   @OneToMany(() => Address, (address) => address.user)
   addresses: Address[];
+
+  @OneToMany(() => Appointment, (appointment) => appointment.user)
+  appointments: Appointment[];
 
   @OneToMany(() => Repair, (repair) => repair.user)
   repairs: Repair[];

@@ -1,6 +1,7 @@
 import { PaymentMethod } from 'src/common/enums/payment-method.enum';
 import { RepairStatus } from 'src/common/enums/repair-status.enum';
 import { Address } from 'src/modules/address/entity/address.entity';
+import { Appointment } from 'src/modules/appointments/entity/appointment.entity';
 import { RepairDetail } from 'src/modules/repair-details/entity/repair-detail.entity';
 import { User } from 'src/modules/user/entity/user.entity';
 
@@ -12,12 +13,18 @@ import {
   PrimaryGeneratedColumn,
   DeleteDateColumn,
   CreateDateColumn,
+  OneToOne,
 } from 'typeorm';
 
 @Entity({ name: 'repairs' })
 export class Repair {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToOne(() => Appointment, (appointment) => appointment.repair, {
+    nullable: true,
+  })
+  appointment?: Appointment;
 
   @CreateDateColumn()
   date: Date;
