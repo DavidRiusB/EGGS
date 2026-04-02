@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
-import { UserUpdateDto } from './user-update.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './entity/user.entity';
-import { DataSource } from 'typeorm';
+import { Admin, DataSource } from 'typeorm';
+import { Role } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class UserService {
@@ -12,14 +18,18 @@ export class UserService {
     return this.userRepository.findAll(pagination);
   }
 
-  async findUserById(id: number): Promise<User> {
-    const user = await this.userRepository.findById(id);
+  async findUserById(id: number, user: User): Promise<User> {
+    const target = await this.userRepository.findById(id);
 
-    if (!user) {
+    if (!target) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    return user;
+    if (user.role !== Role.Admin && user.id !== target.id) {
+      throw new ForbiddenException('You can only access your own user');
+    }
+
+    return target;
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -42,19 +52,39 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, userData: UserUpdateDto): Promise<User> {
-    const user = await this.findUserById(id);
+  async update(id: number, userData: UserUpdateDto, user: User): Promise<User> {
+    const target = await this.findUserById(id, user);
 
-    Object.assign(user, userData);
+    Object.assign(target, userData);
 
-    return this.userRepository.update(user);
+    return this.userRepository.update(target);
   }
 
-  async softDelete(id: number): Promise<void> {
-    const result = await this.userRepository.softDelete(id);
+  async updateUserRole(id: number, role: Role): Promise<User> {
+    const user = await this.userRepository.findById(id);
 
-    if (result.affected === 0) {
+    if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    if (user.role === role) {
+      return user; // no change
+    }
+
+    user.role = role;
+
+    return this.userRepository.updateUserRole(user);
+  }
+
+  async softDelete(id: number, user: User): Promise<void> {
+    const target = await this.findUserById(id, user);
+
+    const result = await this.userRepository.softDelete(target.id);
+
+    if (!result.affected) {
+      throw new InternalServerErrorException(
+        `Failed to delete user with id ${id}`,
+      );
     }
   }
 }

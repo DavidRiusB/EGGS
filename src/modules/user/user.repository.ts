@@ -80,10 +80,9 @@ export class UserRepository {
     try {
       const repo = manager ? manager.getRepository(User) : this.userRepository;
 
-      const { userName, firstName, lastName, email, telephone } = newUserData;
+      const { firstName, lastName, email, telephone } = newUserData;
 
       const newUser = repo.create({
-        userName,
         firstName,
         lastName,
         email,
@@ -98,6 +97,10 @@ export class UserRepository {
 
       throw new InternalServerErrorException('Error creating user');
     }
+  }
+
+  async updateUserRole(user: User): Promise<User> {
+    return this.userRepository.save(user);
   }
 
   async softDelete(id: number): Promise<DeleteResult> {

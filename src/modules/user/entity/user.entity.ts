@@ -19,9 +19,6 @@ export class User {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ unique: true, length: 30 })
-  userName: string;
-
   @Column({
     type: 'enum',
     enum: Role,

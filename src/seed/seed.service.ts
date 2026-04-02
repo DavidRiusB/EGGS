@@ -43,7 +43,6 @@ export class SeedService {
     }
 
     const user = userRepository.create({
-      userName: 'testuser',
       firstName: 'Test',
       lastName: 'User',
       email: 'test@example.com',
