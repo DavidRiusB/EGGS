@@ -120,6 +120,7 @@ export class AppointmentsService {
       if (!appointment) {
         throw new NotFoundException(`Appointment with id: ${id} not found`);
       }
+
       if (user.role !== Role.Admin && user.id !== appointment.user.id) {
         throw new ForbiddenException(
           'You can only cancel your own appointments',
