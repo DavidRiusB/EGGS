@@ -18,6 +18,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/roles.enum';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -27,11 +28,8 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Get()
-  async getAllUsers(
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
-  ) {
-    return this.userService.findAll({ page, limit });
+  async getAllUsers(@Query() pagination: PaginationDto) {
+    return this.userService.findAll(pagination);
   }
 
   @UseGuards(RolesGuard)

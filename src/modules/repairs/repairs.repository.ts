@@ -14,15 +14,40 @@ export class RepairRepository {
     return manager ? manager.getRepository(Repair) : this.repairRepository;
   }
 
-  async findAll(): Promise<Repair[]> {
-    return this.repairRepository.find({ relations: ['user'] });
+  async findAll(pagination: {
+    page: number;
+    limit: number;
+  }): Promise<{ data: Repair[]; total: number }> {
+    const { page, limit } = pagination;
+
+    const offset = (page - 1) * limit;
+
+    const [data, total] = await this.repairRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { date: 'DESC' },
+    });
+
+    return { data, total };
   }
 
-  async findByUser(userId: number): Promise<Repair[]> {
-    return this.repairRepository.find({
+  async findByUser(
+    userId: number,
+    pagination: { page: number; limit: number },
+  ): Promise<{ data: Repair[]; total: number }> {
+    const { page, limit } = pagination;
+
+    const offset = (page - 1) * limit;
+
+    const [data, total] = await this.repairRepository.findAndCount({
       where: { user: { id: userId } },
       relations: ['details', 'address'],
+      skip: offset,
+      take: limit,
+      order: { date: 'DESC' },
     });
+
+    return { data, total };
   }
 
   async findById(id: number, manager?: EntityManager): Promise<Repair | null> {

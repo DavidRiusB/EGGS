@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +15,8 @@ import { UpdateRepairDto } from './dto/update-repair.dto';
 import { AddressRepository } from '../address/address.repository';
 import { UpdateRepairDetailsDto } from './dto/update-repair-details.dto';
 import { RepairDetail } from '../repair-details/entity/repair-detail.entity';
+import { User } from '../user/entity/user.entity';
+import { Role } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class RepairsService {
@@ -25,18 +28,28 @@ export class RepairsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(): Promise<Repair[]> {
-    return this.repairRepository.findAll();
+  async findAll(pagination): Promise<{ data: Repair[]; total: number }> {
+    return this.repairRepository.findAll(pagination);
   }
 
-  async findAllByUser(userId: number): Promise<Repair[]> {
-    return this.repairRepository.findByUser(userId);
+  async findAllByUser(
+    userId: number,
+    pagination: { page: number; limit: number },
+    user: User,
+  ): Promise<{ data: Repair[]; total: number }> {
+    if (user.role !== Role.Admin && user.id !== userId) {
+      throw new ForbiddenException('You can only access your own repairs');
+    }
+    return this.repairRepository.findByUser(userId, pagination);
   }
 
-  async findById(id: number): Promise<Repair> {
+  async findById(id: number, user): Promise<Repair> {
     const repair = await this.repairRepository.findById(id);
     if (!repair) {
       throw new NotFoundException(`Repair ${id} not found`);
+    }
+    if (user.role !== Role.Admin && repair.user.id !== user.id) {
+      throw new ForbiddenException('You can only access your own repairs');
     }
     return repair;
   }

@@ -7,14 +7,16 @@ import {
 import { UserRepository } from './user.repository';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './entity/user.entity';
-import { Admin, DataSource } from 'typeorm';
 import { Role } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async findAll(pagination: { page: number; limit: number }) {
+  async findAll(pagination: {
+    page: number;
+    limit: number;
+  }): Promise<{ data: User[]; total: number }> {
     return this.userRepository.findAll(pagination);
   }
 
