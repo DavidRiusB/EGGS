@@ -9,6 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './entity/products.entity';
 import { ProductType } from 'src/common/enums/product-type.enum';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class ProductsService {
@@ -63,12 +64,15 @@ export class ProductsService {
     }
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepository.findAll();
+  async findAll(pagination): Promise<{ data: Product[]; total: number }> {
+    return this.productRepository.findAll(pagination);
   }
 
-  async findByType(type: ProductType): Promise<Product[]> {
-    return this.productRepository.findAllByType(type);
+  async findByType(
+    type: ProductType,
+    pagination: PaginationDto,
+  ): Promise<{ data: Product[]; total: number }> {
+    return this.productRepository.findAllByType(type, pagination);
   }
 
   async findById(id: number): Promise<Product> {

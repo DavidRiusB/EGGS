@@ -12,6 +12,7 @@ import {
 import { ProductType } from 'src/common/enums/product-type.enum';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -47,12 +48,34 @@ export class ProductsRepository {
     return this.productRepository.save(newProduct);
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepository.find();
+  async findAll(pagination: {
+    page: number;
+    limit: number;
+  }): Promise<{ data: Product[]; total: number }> {
+    const { page, limit } = pagination;
+    const offset = (page - 1) * limit;
+    const [data, total] = await this.productRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: { name: 'ASC' },
+    });
+    return { data, total };
   }
 
-  async findAllByType(type: ProductType): Promise<Product[]> {
-    return this.productRepository.find({ where: { type } });
+  async findAllByType(
+    type: ProductType,
+    pagination: PaginationDto,
+  ): Promise<{ data: Product[]; total: number }> {
+    const { page, limit } = pagination;
+    const offset = (page - 1) * limit;
+
+    const [data, total] = await this.productRepository.findAndCount({
+      where: { type },
+      skip: offset,
+      take: limit,
+      order: { name: 'ASC' },
+    });
+    return { data, total };
   }
 
   async findById(id: number): Promise<Product | null> {
