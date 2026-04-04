@@ -4,6 +4,8 @@ import { Appointment } from './entity/appointment.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 import { FindAppointmentsDto } from './dto/find-appointments.dto';
 import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
+import { skip } from 'node:test';
+import { off } from 'process';
 
 @Injectable()
 export class AppointmentsRepository {
@@ -21,7 +23,7 @@ export class AppointmentsRepository {
   async findWithFilters(
     filters: FindAppointmentsDto,
     manager?: EntityManager,
-  ): Promise<Appointment[]> {
+  ): Promise<{ data: Appointment[]; total: number }> {
     const repo = this.getRepo(manager);
 
     const query = repo
@@ -75,7 +77,14 @@ export class AppointmentsRepository {
       .orderBy('appointment.date', 'ASC')
       .addOrderBy('appointment.slot', 'ASC');
 
-    return await query.getMany();
+    // ✅ pagination
+    const offset = (filters.page - 1) * filters.limit;
+    query.skip(offset).take(filters.limit);
+
+    // ✅ get total + data
+    const [data, total] = await query.getManyAndCount();
+
+    return { data, total };
   }
 
   async getById(

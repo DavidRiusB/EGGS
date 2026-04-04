@@ -9,11 +9,13 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() newUserData: RegisterUserDto) {
-    return await this.authService.register(newUserData);
+    return this.authService.register(newUserData);
   }
 
   @Post('login')
   async login(@Body() Credentials: LoginUserDto) {
-    return await this.authService.signIn(Credentials);
+    return this.authService.signIn(Credentials);
   }
+
+  // reset passwords
 }

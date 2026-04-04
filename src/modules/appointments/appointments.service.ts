@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,8 @@ import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UserRepository } from '../user/user.repository';
 import { RepairRepository } from '../repairs/repairs.repository';
+import { User } from '../user/entity/user.entity';
+import { Role } from 'src/common/enums/roles.enum';
 
 @Injectable()
 export class AppointmentsService {
@@ -21,12 +24,20 @@ export class AppointmentsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  updateAppointment(id: number, data: any) {
+  updateAppointment(id: number, data: any, user) {
     throw new Error('Method not implemented.');
   }
 
-  async createAppointment(data: CreateAppointmentDto): Promise<Appointment> {
+  async createAppointment(
+    data: CreateAppointmentDto,
+    userAuth,
+  ): Promise<Appointment> {
     const { date, slot, userId, repairId, notes } = data;
+    if (userAuth.role !== Role.Admin && userAuth.id !== data.userId) {
+      throw new ForbiddenException(
+        'You can only create appointments for your own user',
+      );
+    }
 
     try {
       return await this.dataSource.transaction(async (manager) => {
@@ -70,19 +81,36 @@ export class AppointmentsService {
     }
   }
 
-  async findById(id: number): Promise<Appointment> {
+  async findById(id: number, user: User): Promise<Appointment> {
     const appointment = await this.appointmentsRepository.getById(id);
     if (!appointment) {
       throw new NotFoundException(`Appointment with id: ${id} not found`);
     }
+    if (user.role !== Role.Admin && user.id !== appointment.user.id) {
+      throw new ForbiddenException('You can only access your own appointments');
+    }
     return appointment;
   }
 
-  async findAppointments(query: FindAppointmentsDto): Promise<Appointment[]> {
-    return this.appointmentsRepository.findWithFilters(query);
+  async findAppointments(
+    query: FindAppointmentsDto,
+    user: User,
+  ): Promise<{ data: Appointment[]; total: number }> {
+    if (query.startDate && query.endDate) {
+      const start = new Date(query.startDate);
+      const end = new Date(query.endDate);
+      if (start > end) {
+        throw new BadRequestException('Start date must be before end date');
+      }
+    }
+    const filters = {
+      ...query,
+      userId: user.role === Role.Admin ? query.userId : user.id,
+    };
+    return this.appointmentsRepository.findWithFilters(filters);
   }
 
-  async cancelAppointment(id: number): Promise<Appointment> {
+  async cancelAppointment(id: number, user: User): Promise<Appointment> {
     return this.dataSource.transaction(async (manager) => {
       const appointment = await this.appointmentsRepository.getById(
         id,
@@ -91,6 +119,11 @@ export class AppointmentsService {
 
       if (!appointment) {
         throw new NotFoundException(`Appointment with id: ${id} not found`);
+      }
+      if (user.role !== Role.Admin && user.id !== appointment.user.id) {
+        throw new ForbiddenException(
+          'You can only cancel your own appointments',
+        );
       }
 
       if (appointment.status === AppointmentStatus.CANCELLED) {
