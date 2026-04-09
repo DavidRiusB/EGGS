@@ -13,6 +13,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { SwaggerModule } from './swagger/swagger.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { APP_GUARD } from '@nestjs/core';
     SeedModule,
     ProductsModule,
     AppointmentsModule,
+    SwaggerModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
