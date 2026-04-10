@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SwaggerService } from './swagger.service';
+import SwaggerService from './swagger.service';
 
 describe('SwaggerService', () => {
   let service: SwaggerService;
