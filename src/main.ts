@@ -13,7 +13,8 @@ async function bootstrap() {
   app.use(helmet());
 
   app.enableCors({
-    origin: true,
+    origin: 'http://localhost:3001',
+    credentials: true,
   });
 
   app.use(cookieParser());
