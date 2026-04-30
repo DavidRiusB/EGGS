@@ -5,6 +5,7 @@ import { SeedService } from './seed/seed.service';
 import { ValidationPipe } from '@nestjs/common';
 import SwaggerService from './swagger/swagger.service';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 dotenvConfig({ path: '.env' });
 
@@ -14,8 +15,12 @@ async function bootstrap() {
   app.use(helmet());
 
   app.enableCors({
-    origin: true,
+    origin: 'http://localhost:3001',
+    credentials: true,
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(cookieParser());
 
   SwaggerService.setup(app);
 
