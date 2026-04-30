@@ -4,6 +4,7 @@ import { Address } from 'src/modules/address/entity/address.entity';
 import { Appointment } from 'src/modules/appointments/entity/appointment.entity';
 import { RepairDetail } from 'src/modules/repair-details/entity/repair-detail.entity';
 import { User } from 'src/modules/user/entity/user.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   Column,
@@ -18,6 +19,7 @@ import {
 
 @Entity({ name: 'repairs' })
 export class Repair {
+  @ApiProperty({ description: 'Auto-generated repair ID.', example: 1 })
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,6 +28,11 @@ export class Repair {
   })
   appointment?: Appointment;
 
+  @ApiProperty({
+    description: 'Date the repair was created.',
+    type: String,
+    format: 'date-time',
+  })
   @CreateDateColumn()
   date: Date;
 
@@ -37,6 +44,11 @@ export class Repair {
   })
   details: RepairDetail[];
 
+  @ApiProperty({
+    description: 'Workflow status.',
+    enum: RepairStatus,
+    example: RepairStatus.PENDING,
+  })
   @Column({
     type: 'enum',
     enum: RepairStatus,
@@ -44,6 +56,10 @@ export class Repair {
   })
   status: RepairStatus;
 
+  @ApiProperty({
+    description: 'Total repair price (decimal stored as string).',
+    example: '249.99',
+  })
   @Column({
     type: 'decimal',
     precision: 10,
@@ -51,11 +67,19 @@ export class Repair {
   })
   price: string;
 
+  @ApiPropertyOptional({
+    description: 'Optional ID of the coupon applied to the repair.',
+    example: 7,
+  })
   @Column({
     nullable: true,
   })
   couponId?: number;
 
+  @ApiPropertyOptional({
+    description: 'Discount amount applied (decimal stored as string).',
+    example: '25.00',
+  })
   @Column({
     type: 'decimal',
     precision: 10,
@@ -64,6 +88,10 @@ export class Repair {
   })
   discountAmount?: string;
 
+  @ApiProperty({
+    description: 'Payment method used for the repair.',
+    enum: PaymentMethod,
+  })
   @Column({
     type: 'enum',
     enum: PaymentMethod,
@@ -73,6 +101,12 @@ export class Repair {
   @ManyToOne(() => Address)
   address: Address;
 
+  @ApiPropertyOptional({
+    description: 'Soft-delete timestamp; null when the repair is active.',
+    type: String,
+    format: 'date-time',
+    nullable: true,
+  })
   @DeleteDateColumn({
     nullable: true,
   })

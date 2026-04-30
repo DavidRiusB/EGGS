@@ -8,21 +8,35 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CardinalDirection } from 'src/common/enums/cardinal-directions.enum';
 import { AddressSuffix } from 'src/common/enums/address-suffixes.enum';
 import { State } from 'src/common/enums/states.enums';
 
 export class AddressDto {
+  @ApiProperty({
+    description: 'Street number.',
+    example: 1234,
+  })
   @IsNotEmpty({ message: 'Address number is required' })
   @IsNumber({}, { message: 'Address number must be a valid number' })
   number: number;
 
+  @ApiPropertyOptional({
+    description: 'Cardinal direction prefix (N, S, E, W, etc.).',
+    enum: CardinalDirection,
+  })
   @IsOptional()
   @IsEnum(CardinalDirection, {
     message: 'Invalid cardinal direction',
   })
   cardinalDirection?: CardinalDirection;
 
+  @ApiProperty({
+    description: 'Street name.',
+    example: 'Main',
+    maxLength: 100,
+  })
   @IsNotEmpty({ message: 'Street name is required' })
   @IsString({ message: 'Street name must be a string' })
   @MaxLength(100, {
@@ -30,12 +44,21 @@ export class AddressDto {
   })
   streetName: string;
 
+  @ApiProperty({
+    description: 'Street suffix (St, Ave, Blvd, etc.).',
+    enum: AddressSuffix,
+  })
   @IsNotEmpty({ message: 'Address suffix is required' })
   @IsEnum(AddressSuffix, {
     message: 'Invalid address suffix',
   })
   suffix: AddressSuffix;
 
+  @ApiProperty({
+    description: 'City name.',
+    example: 'Salt Lake City',
+    maxLength: 100,
+  })
   @IsNotEmpty({ message: 'City is required' })
   @IsString({ message: 'City must be a string' })
   @MaxLength(100, {
@@ -43,12 +66,22 @@ export class AddressDto {
   })
   city: string;
 
+  @ApiProperty({
+    description: 'US state.',
+    enum: State,
+  })
   @IsNotEmpty({ message: 'State is required' })
   @IsEnum(State, {
     message: 'Invalid state value',
   })
   state: State;
 
+  @ApiProperty({
+    description: 'Zip code (5-10 characters).',
+    example: '84101',
+    minLength: 5,
+    maxLength: 10,
+  })
   @IsNotEmpty({ message: 'Zip code is required' })
   @IsString({ message: 'Zip code must be a string' })
   @MinLength(5, {
@@ -59,6 +92,11 @@ export class AddressDto {
   })
   zipCode: string;
 
+  @ApiPropertyOptional({
+    description: 'Free-form notes (apartment, gate code, etc.).',
+    example: 'Apt 4B',
+    maxLength: 500,
+  })
   @IsOptional()
   @IsString({ message: 'Notes must be a string' })
   @MaxLength(500, {
@@ -66,6 +104,10 @@ export class AddressDto {
   })
   notes?: string;
 
+  @ApiPropertyOptional({
+    description: 'Marks this address as the user primary address.',
+    example: false,
+  })
   @IsOptional()
   @IsBoolean({ message: 'isPrimary must be a boolean value' })
   isPrimary?: boolean;

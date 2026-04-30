@@ -12,11 +12,14 @@ import { RegisterUserDto } from './dto/register.dto';
 import { LoginUserDto } from './dto/login.dto';
 import type { Response, Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import * as AuthDocs from '../../swagger/decorators/auth.docs';
 
+@AuthDocs.AuthDocs()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @AuthDocs.RegisterDocs()
   @Post('register')
   async register(
     @Body() newUserData: RegisterUserDto,
@@ -38,6 +41,7 @@ export class AuthController {
     return user;
   }
 
+  @AuthDocs.LoginDocs()
   @Post('login')
   async login(
     @Body() credentials: LoginUserDto,
@@ -54,12 +58,14 @@ export class AuthController {
     return user;
   }
 
+  @AuthDocs.MeDocs()
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async me(@Req() req) {
     return req.user;
   }
 
+  @AuthDocs.LogoutDocs()
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {

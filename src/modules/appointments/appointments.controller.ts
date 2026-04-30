@@ -15,12 +15,15 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import * as AppointmentsDocs from '../../swagger/decorators/appointments.docs';
 
+@AppointmentsDocs.AppointmentsDocs()
 @Controller('appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
+  @AppointmentsDocs.FindAppointmentsDocs()
   @Get()
   async findAppointments(
     @Query() query: FindAppointmentsDto,
@@ -29,6 +32,7 @@ export class AppointmentsController {
     return this.appointmentsService.findAppointments(query, user);
   }
 
+  @AppointmentsDocs.FindAppointmentByIdDocs()
   @Get(':id')
   async findAppointmentById(
     @Param('id', ParseIntPipe) id: number,
@@ -37,6 +41,7 @@ export class AppointmentsController {
     return this.appointmentsService.findById(id, user);
   }
 
+  @AppointmentsDocs.CreateAppointmentDocs()
   @Post()
   async createAppointment(
     @Body() data: CreateAppointmentDto,
@@ -45,6 +50,7 @@ export class AppointmentsController {
     return this.appointmentsService.createAppointment(data, user);
   }
 
+  @AppointmentsDocs.UpdateAppointmentDocs()
   @Patch(':id')
   async updateAppointment(
     @Param('id', ParseIntPipe) id: number,
@@ -56,6 +62,7 @@ export class AppointmentsController {
     // missing
   }
 
+  @AppointmentsDocs.CancelAppointmentDocs()
   @Patch(':id/cancel')
   async cancelAppointment(
     @Param('id', ParseIntPipe) id: number,

@@ -9,14 +9,25 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductType } from 'src/common/enums/product-type.enum';
 
 export class UpdateRepairDetailDto {
+  @ApiPropertyOptional({
+    description: 'Detail name.',
+    example: 'Screen replacement',
+    maxLength: 150,
+  })
   @IsOptional()
   @IsString({ message: 'Name must be a string' })
   @MaxLength(150, { message: 'Name must not exceed 150 characters' })
   name?: string;
 
+  @ApiPropertyOptional({
+    description: 'Detail description.',
+    example: 'OEM-grade replacement screen for iPhone 15.',
+    maxLength: 500,
+  })
   @IsOptional()
   @IsString({ message: 'Description must be a string' })
   @MaxLength(500, {
@@ -24,22 +35,40 @@ export class UpdateRepairDetailDto {
   })
   description?: string;
 
+  @ApiPropertyOptional({
+    description: 'Quantity of this line item.',
+    example: 1,
+    minimum: 1,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Quantity must be a number' })
   @IsPositive({ message: 'Quantity must be greater than 0' })
   quantity?: number;
 
+  @ApiPropertyOptional({
+    description: 'Whether the detail is billed by time (e.g. labor).',
+    example: false,
+  })
   @IsOptional()
   @IsBoolean({ message: 'isTimeBased must be true or false' })
   isTimeBased?: boolean;
 
+  @ApiPropertyOptional({
+    description: 'Unit price.',
+    example: 199.99,
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'Price must be a number' })
   @Min(0, { message: 'Price cannot be negative' })
   price?: number;
 
+  @ApiPropertyOptional({
+    description: 'Detail category.',
+    enum: ProductType,
+  })
   @IsOptional()
   @IsEnum(ProductType, {
     message: 'Type must be one of: material, labor, part, fee, or other',

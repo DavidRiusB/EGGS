@@ -28,7 +28,7 @@ import * as RepairDocs from '../../swagger/decorators/repairs.docs';
 export class RepairsController {
   constructor(private readonly repairService: RepairsService) {}
 
-  @RepairDocs.getAllRepairs()
+  @RepairDocs.GetAllRepairsDocs()
   @Get()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
@@ -36,7 +36,7 @@ export class RepairsController {
     return this.repairService.findAll(pagination);
   }
 
-  @RepairDocs.getRepairsByUserIdDocs()
+  @RepairDocs.GetRepairsByUserIdDocs()
   @Get('user/:userId')
   async getRepairsByUser(
     @Param('userId', ParseIntPipe) userId: number,
@@ -46,13 +46,13 @@ export class RepairsController {
     return this.repairService.findAllByUser(userId, pagination, user);
   }
 
-  @RepairDocs.getRepairsByIdDocs()
+  @RepairDocs.GetRepairByIdDocs()
   @Get(':id')
   async getById(@Param('id', ParseIntPipe) id: number, @CurrentUser() user) {
     return this.repairService.findById(id, user);
   }
 
-  @RepairDocs.creatRepairDocs()
+  @RepairDocs.CreateRepairDocs()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Post()
@@ -60,7 +60,7 @@ export class RepairsController {
     return this.repairService.createRepair(data);
   }
 
-  @RepairDocs.updateRepairByIdDocs()
+  @RepairDocs.UpdateRepairDocs()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Patch(':id')
@@ -71,7 +71,7 @@ export class RepairsController {
     return this.repairService.updateRepair(id, data);
   }
 
-  @RepairDocs.updateRepairDetailsDocs()
+  @RepairDocs.UpdateRepairDetailsDocs()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Patch(':id/details')
@@ -82,7 +82,7 @@ export class RepairsController {
     return this.repairService.updateRepairDetails(id, data);
   }
 
-  @RepairDocs.deleteRepairByIdDocs()
+  @RepairDocs.DeleteRepairDocs()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Delete(':id')

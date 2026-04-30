@@ -11,7 +11,7 @@ dotenvConfig({ path: '.env' });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+
   app.use(helmet());
 
   app.enableCors({
@@ -19,7 +19,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(cookieParser());
 
   SwaggerService.setup(app);

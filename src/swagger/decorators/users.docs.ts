@@ -1,14 +1,19 @@
 // src/swagger/decorators/users.docs.ts
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { User } from 'src/modules/user/entity/user.entity';
 
 export function UsersDocs() {
   return applyDecorators(
@@ -21,7 +26,24 @@ export function UsersDocs() {
 export function GetAllUsersDocs() {
   return applyDecorators(
     ApiOperation({ summary: 'Get all users' }),
-    ApiOkResponse({ description: 'Returns a paginated list of users.' }),
+    ApiQuery({
+      name: 'page',
+      type: Number,
+      required: false,
+      description: 'Page number (1-indexed).',
+      example: 1,
+    }),
+    ApiQuery({
+      name: 'limit',
+      type: Number,
+      required: false,
+      description: 'Number of items per page.',
+      example: 20,
+    }),
+    ApiOkResponse({
+      description: 'Returns a paginated list of users.',
+      type: User,
+    }),
     ApiForbiddenResponse({ description: 'Admin only.' }),
   );
 }
@@ -35,8 +57,9 @@ export function GetUserByEmailDocs() {
       description: 'The user email address',
       example: 'user@example.com',
     }),
-    ApiOkResponse({ description: 'Returns the matching user.' }),
+    ApiOkResponse({ description: 'Returns the matching user.', type: User }),
     ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
@@ -49,8 +72,9 @@ export function GetUserByTelephoneDocs() {
       description: 'The user telephone number',
       example: '8015551234',
     }),
-    ApiOkResponse({ description: 'Returns the matching user.' }),
+    ApiOkResponse({ description: 'Returns the matching user.', type: User }),
     ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
@@ -63,7 +87,12 @@ export function GetUserByIdDocs() {
       description: 'The user ID',
       example: 1,
     }),
-    ApiOkResponse({ description: 'Returns the requested user.' }),
+    ApiOkResponse({ description: 'Returns the requested user.', type: User }),
+    ApiForbiddenResponse({
+      description:
+        'Forbidden when accessing another user without admin rights.',
+    }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
@@ -76,7 +105,12 @@ export function UpdateUserDocs() {
       description: 'The user ID',
       example: 1,
     }),
-    ApiOkResponse({ description: 'Returns the updated user.' }),
+    ApiOkResponse({ description: 'Returns the updated user.', type: User }),
+    ApiBadRequestResponse({ description: 'Validation failed.' }),
+    ApiForbiddenResponse({
+      description: 'Forbidden when updating another user without admin rights.',
+    }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
@@ -89,8 +123,13 @@ export function UpdateUserRoleDocs() {
       description: 'The user ID',
       example: 1,
     }),
-    ApiOkResponse({ description: 'Returns the user with the updated role.' }),
+    ApiOkResponse({
+      description: 'Returns the user with the updated role.',
+      type: User,
+    }),
+    ApiBadRequestResponse({ description: 'Validation failed.' }),
     ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
@@ -103,6 +142,10 @@ export function DeleteUserDocs() {
       description: 'The user ID',
       example: 1,
     }),
-    ApiOkResponse({ description: 'User deleted successfully.' }),
+    ApiNoContentResponse({ description: 'User deleted successfully.' }),
+    ApiForbiddenResponse({
+      description: 'Forbidden when deleting another user without admin rights.',
+    }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }

@@ -14,12 +14,15 @@ import { AddressDto } from './dto/address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import * as AddressDocs from '../../swagger/decorators/address.docs';
 
+@AddressDocs.AddressesDocs()
 @Controller('addresses')
 @UseGuards(JwtAuthGuard)
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
+  @AddressDocs.GetUserAddressesDocs()
   @Get('user/:id')
   async getUserAddresses(
     @Param('id', ParseIntPipe) id: number,
@@ -28,6 +31,7 @@ export class AddressController {
     return this.addressService.findUserAddresses(id, user);
   }
 
+  @AddressDocs.RegisterAddressDocs()
   @Post('user/:id')
   async registerAddress(
     @Param('id', ParseIntPipe) id: number,
@@ -37,6 +41,7 @@ export class AddressController {
     return await this.addressService.createAddress(data, id, user);
   }
 
+  @AddressDocs.UpdateAddressDocs()
   @Patch(':id')
   async updateAddress(
     @Param('id', ParseIntPipe) id: number,
@@ -46,6 +51,7 @@ export class AddressController {
     return this.addressService.updateAddress(id, data, user);
   }
 
+  @AddressDocs.DeleteAddressDocs()
   @Delete(':id')
   async deleteAddress(
     @Param('id', ParseIntPipe) id: number,

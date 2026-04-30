@@ -20,18 +20,22 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/roles.enum';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import * as ProductsDocs from '../../swagger/decorators/products.docs';
 
+@ProductsDocs.ProductsDocs()
 @Controller('products')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProductsController {
   constructor(private readonly productService: ProductsService) {}
 
+  @ProductsDocs.GetAllProductsDocs()
   @Roles(Role.Admin)
   @Get()
   async getAll(@Query() pagination: PaginationDto) {
     return this.productService.findAll(pagination);
   }
 
+  @ProductsDocs.GetProductsByTypeDocs()
   @Roles(Role.Admin)
   @Get('by-type')
   async getByType(
@@ -42,24 +46,28 @@ export class ProductsController {
     return this.productService.findByType(type, pagination);
   }
 
+  @ProductsDocs.GetProductByNameDocs()
   @Roles(Role.Admin)
   @Get('by-name')
   async getByName(@Query('name') name: string) {
     return this.productService.findByName(name);
   }
 
+  @ProductsDocs.GetProductByIdDocs()
   @Roles(Role.Admin)
   @Get(':id')
   async getById(@Param('id', ParseIntPipe) id: number) {
     return this.productService.findById(id);
   }
 
+  @ProductsDocs.CreateProductDocs()
   @Roles(Role.Admin)
   @Post()
   async createProduct(@Body() data: CreateProductDto) {
     return this.productService.createProduct(data);
   }
 
+  @ProductsDocs.UpdateProductDocs()
   @Roles(Role.Admin)
   @Patch(':id')
   async updateProduct(
@@ -69,6 +77,7 @@ export class ProductsController {
     return this.productService.updateProduct(id, data);
   }
 
+  @ProductsDocs.DeleteProductDocs()
   @Roles(Role.Admin)
   @Delete(':id')
   async softDelete(@Param('id', ParseIntPipe) id: number) {

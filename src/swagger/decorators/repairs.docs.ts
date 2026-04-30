@@ -1,14 +1,23 @@
-// src/swagger/decorators/users.docs.ts
-import { applyDecorators, ParseIntPipe } from '@nestjs/common';
+// src/swagger/decorators/repairs.docs.ts
+import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { CreateRepairDto } from 'src/modules/repairs/dto/create-repair.dto';
+import { UpdateRepairDto } from 'src/modules/repairs/dto/update-repair.dto';
+import { UpdateRepairDetailsDto } from 'src/modules/repairs/dto/update-repair-details.dto';
+import { Repair } from 'src/modules/repairs/entity/repairs.entity';
 
 export function RepairsDocs() {
   return applyDecorators(
@@ -18,75 +27,151 @@ export function RepairsDocs() {
   );
 }
 
-export function getAllRepairs() {
+export function GetAllRepairsDocs() {
   return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({
-      description: 'Get all Repairs',
+    ApiOperation({ summary: 'Get all repairs' }),
+    ApiQuery({
+      name: 'page',
+      type: Number,
+      required: false,
+      description: 'Page number (1-indexed).',
+      example: 1,
     }),
-    ApiParam({ name: 'pagination' }),
+    ApiQuery({
+      name: 'limit',
+      type: Number,
+      required: false,
+      description: 'Number of items per page.',
+      example: 20,
+    }),
+    ApiOkResponse({
+      description: 'Returns a paginated list of repairs.',
+      type: Repair,
+    }),
+    ApiForbiddenResponse({ description: 'Admin only.' }),
   );
 }
 
-export function getRepairsByUserIdDocs() {
+export function GetRepairsByUserIdDocs() {
   return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({ description: 'Returns repairs for the user by UserID' }),
-    ApiParam({ name: 'userId', type: ParseIntPipe }),
-  );
-}
-
-export function getRepairsByIdDocs() {
-  return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({ description: 'Returns repairs for the user by ID' }),
-    ApiParam({ name: 'Id', type: ParseIntPipe }),
-  );
-}
-
-export function creatRepairDocs() {
-  return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({
+    ApiOperation({ summary: 'Get repairs by user ID' }),
+    ApiParam({
+      name: 'userId',
+      type: Number,
+      description: 'The user ID',
+      example: 1,
+    }),
+    ApiQuery({
+      name: 'page',
+      type: Number,
+      required: false,
+      description: 'Page number (1-indexed).',
+      example: 1,
+    }),
+    ApiQuery({
+      name: 'limit',
+      type: Number,
+      required: false,
+      description: 'Number of items per page.',
+      example: 20,
+    }),
+    ApiOkResponse({
+      description: 'Returns a paginated list of repairs for the user.',
+      type: Repair,
+    }),
+    ApiForbiddenResponse({
       description:
-        "Creates a repair, though it doesn't seem to have an identifier? Might need review",
+        'Forbidden when accessing another user without admin rights.',
     }),
-  );
-}
-export function updateRepairByIdDocs() {
-  return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({ description: 'Updates repair for the user by ID' }),
-    ApiParam({ name: 'Id', type: ParseIntPipe }),
+    ApiNotFoundResponse({ description: 'User not found.' }),
   );
 }
 
-export function updateRepairDetailsDocs() {
+export function GetRepairByIdDocs() {
   return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({ description: 'Updates repair details' }),
-    ApiParam({ name: 'Id', type: ParseIntPipe }),
+    ApiOperation({ summary: 'Get a repair by ID' }),
+    ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The repair ID',
+      example: 1,
+    }),
+    ApiOkResponse({
+      description: 'Returns the requested repair.',
+      type: Repair,
+    }),
+    ApiForbiddenResponse({
+      description:
+        'Forbidden when accessing another user repair without admin rights.',
+    }),
+    ApiNotFoundResponse({ description: 'Repair not found.' }),
   );
 }
 
-export function deleteRepairByIdDocs() {
+export function CreateRepairDocs() {
   return applyDecorators(
-    ApiBearerAuth(),
-    ApiOkResponse({ description: 'Successfully executed' }),
-    ApiForbiddenResponse({ description: 'Unauthorized' }),
-    ApiOperation({ description: 'Deletes repair for the user by ID' }),
-    ApiParam({ name: 'Id', type: ParseIntPipe }),
+    ApiOperation({ summary: 'Create a repair' }),
+    ApiBody({ type: CreateRepairDto }),
+    ApiOkResponse({
+      description: 'Returns the created repair.',
+      type: Repair,
+    }),
+    ApiBadRequestResponse({ description: 'Validation failed.' }),
+    ApiForbiddenResponse({ description: 'Admin only.' }),
+  );
+}
+
+export function UpdateRepairDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Update a repair' }),
+    ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The repair ID',
+      example: 1,
+    }),
+    ApiBody({ type: UpdateRepairDto }),
+    ApiOkResponse({
+      description: 'Returns the updated repair.',
+      type: Repair,
+    }),
+    ApiBadRequestResponse({ description: 'Validation failed.' }),
+    ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'Repair not found.' }),
+  );
+}
+
+export function UpdateRepairDetailsDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Update repair details (line items)' }),
+    ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The repair ID',
+      example: 1,
+    }),
+    ApiBody({ type: UpdateRepairDetailsDto }),
+    ApiOkResponse({
+      description: 'Returns the repair with updated details.',
+      type: Repair,
+    }),
+    ApiBadRequestResponse({ description: 'Validation failed.' }),
+    ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'Repair not found.' }),
+  );
+}
+
+export function DeleteRepairDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Soft delete a repair' }),
+    ApiParam({
+      name: 'id',
+      type: Number,
+      description: 'The repair ID',
+      example: 1,
+    }),
+    ApiNoContentResponse({ description: 'Repair deleted successfully.' }),
+    ApiForbiddenResponse({ description: 'Admin only.' }),
+    ApiNotFoundResponse({ description: 'Repair not found.' }),
   );
 }

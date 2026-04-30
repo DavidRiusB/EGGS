@@ -26,6 +26,7 @@ import * as UserDocs from '../../swagger/decorators/users.docs';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UserDocs.GetAllUsersDocs()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Get()
