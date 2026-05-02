@@ -23,10 +23,10 @@ export class CreateAppointmentDto {
   @Transform(({ value }) => (value === '' ? undefined : value))
   slot: AppointmentSlot;
 
-  @IsNotEmpty({ message: 'User ID is required' })
+  @IsOptional()
   @Transform(({ value }) => (value === '' ? undefined : Number(value)))
   @IsNumber({}, { message: 'User ID must be a valid number' })
-  userId: number;
+  userId?: number;
 
   @IsOptional()
   @Transform(({ value }) => (value === '' ? undefined : Number(value)))

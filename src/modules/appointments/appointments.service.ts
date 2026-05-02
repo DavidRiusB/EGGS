@@ -30,24 +30,49 @@ export class AppointmentsService {
 
   async createAppointment(
     data: CreateAppointmentDto,
-    userAuth,
+    userAuth: User,
   ): Promise<Appointment> {
     const { date, slot, userId, repairId, notes } = data;
-    if (userAuth.role !== Role.Admin && userAuth.id !== data.userId) {
-      throw new ForbiddenException(
-        'You can only create appointments for your own user',
-      );
+
+    // 🔒 Permission logic (strict, no silent fallback)
+    let targetUserId: number;
+
+    if (userAuth.role !== Role.Admin) {
+      // Normal user
+
+      // ❌ Trying to spoof another user
+      if (userId && userId !== userAuth.id) {
+        throw new ForbiddenException(
+          'You can only create appointments for your own user',
+        );
+      }
+
+      // ✅ Always use auth user
+      targetUserId = userAuth.id;
+    } else {
+      // Admin
+
+      if (!userId) {
+        throw new BadRequestException(
+          'Admin must provide a userId to create an appointment',
+        );
+      }
+
+      targetUserId = userId;
     }
 
     try {
       return await this.dataSource.transaction(async (manager) => {
         // 🔹 1. Validate user
-        const user = await this.userRepository.findById(userId, manager);
+        const user = await this.userRepository.findById(targetUserId, manager);
 
         if (!user) {
-          throw new NotFoundException(`User with id: ${userId} not found`);
+          throw new NotFoundException(
+            `User with id: ${targetUserId} not found`,
+          );
         }
 
+        // 🔹 2. Validate repair (optional)
         const repair =
           repairId !== undefined
             ? await this.repairRepository.findById(repairId, manager)
@@ -66,11 +91,10 @@ export class AppointmentsService {
           notes,
         });
 
-        // 🔹 4. Save (this is where unique constraint may explode)
+        // 🔹 4. Save
         return await manager.save(appointment);
       });
     } catch (error: any) {
-      // 🔥 Handle unique constraint (slot already taken)
       if (error.code === '23505') {
         throw new BadRequestException(
           `The slot ${slot} on ${date} is already booked`,
