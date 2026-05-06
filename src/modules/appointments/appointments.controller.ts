@@ -15,6 +15,7 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { GetAvailabilityDto } from './dto/get-availability.dto';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,6 +28,11 @@ export class AppointmentsController {
     @CurrentUser() user,
   ) {
     return this.appointmentsService.findAppointments(query, user);
+  }
+
+  @Get('/availability')
+  async getAvailability() {
+    return this.appointmentsService.getAvailability();
   }
 
   @Get(':id')

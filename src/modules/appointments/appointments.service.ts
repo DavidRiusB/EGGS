@@ -14,6 +14,8 @@ import { UserRepository } from '../user/user.repository';
 import { RepairRepository } from '../repairs/repairs.repository';
 import { User } from '../user/entity/user.entity';
 import { Role } from 'src/common/enums/roles.enum';
+import { AvailabilityDay } from './types/availability.types';
+import { AppointmentSlot } from 'src/common/enums/appointment-slot.enum';
 
 @Injectable()
 export class AppointmentsService {
@@ -103,6 +105,46 @@ export class AppointmentsService {
 
       throw error;
     }
+  }
+
+  private readonly WINDOW_DAYS = parseInt(
+    process.env.APPOINTMENT_AVAILABILITY_WINDOW_DAYS ?? '14',
+    10,
+  );
+
+  async getAvailability(): Promise<AvailabilityDay[]> {
+    const from = new Date();
+    from.setHours(0, 0, 0, 0);
+
+    const to = new Date(from);
+    to.setDate(to.getDate() + this.WINDOW_DAYS);
+
+    const bookedSlots = await this.appointmentsRepository.findBookedSlots(
+      from,
+      to,
+    );
+
+    const bookedKeys = new Set(bookedSlots.map((b) => `${b.date}|${b.slot}`));
+
+    const allSlots: AppointmentSlot[] = [
+      AppointmentSlot.MORNING,
+      AppointmentSlot.AFTERNOON,
+      AppointmentSlot.EVENING,
+    ];
+
+    const days: AvailabilityDay[] = [];
+    for (let d = new Date(from); d < to; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().slice(0, 10);
+      days.push({
+        date: dateStr,
+        slots: allSlots.map((slot) => ({
+          slot,
+          available: !bookedKeys.has(`${dateStr}|${slot}`),
+        })),
+      });
+    }
+
+    return days;
   }
 
   async findById(id: number, user: User): Promise<Appointment> {

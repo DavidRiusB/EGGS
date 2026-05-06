@@ -4,8 +4,8 @@ import { Appointment } from './entity/appointment.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 import { FindAppointmentsDto } from './dto/find-appointments.dto';
 import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
-import { skip } from 'node:test';
-import { off } from 'process';
+import { AvailabilityDay } from './types/availability.types';
+import { AppointmentSlot } from 'src/common/enums/appointment-slot.enum';
 
 @Injectable()
 export class AppointmentsRepository {
@@ -102,5 +102,22 @@ export class AppointmentsRepository {
   async softDelete(id: number, manager?: EntityManager): Promise<DeleteResult> {
     const repo = this.getRepo(manager);
     return repo.softDelete(id);
+  }
+
+  async findBookedSlots(
+    from: Date,
+    to: Date,
+    manager?: EntityManager,
+  ): Promise<Appointment[]> {
+    const repo = this.getRepo(manager);
+    const query = repo
+      .createQueryBuilder('appointment')
+      .select(['appointment.date', 'appointment.slot'])
+      .where('appointment.date >= :from', { from })
+      .andWhere('appointment.date < :to', { to })
+      // .andWhere('appointment.status != :cancelled', { cancelled: 'cancelled' })
+      .getMany();
+
+    return query;
   }
 }
