@@ -58,13 +58,9 @@ export class UserController {
     return this.userService.findUserById(id, user);
   }
 
-  @Patch(':id')
-  async updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() userData: UserUpdateDto,
-    @CurrentUser() user,
-  ) {
-    return this.userService.update(id, userData, user);
+  @Patch('me')
+  async updateUser(@Body() userData: UserUpdateDto, @CurrentUser() user) {
+    return this.userService.update(userData, user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

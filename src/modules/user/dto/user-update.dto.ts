@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -34,11 +35,11 @@ export class UserUpdateDto {
   })
   email?: string;
 
-  @IsOptional()
+  @IsString()
   @IsString({ message: 'Telephone must be a string' })
   @Matches(/^\+?[1-9]\d{7,14}$/, {
     message:
       'Telephone must be a valid international number (8–15 digits, optional +)',
   })
-  telephone?: string;
+  telephone: string;
 }

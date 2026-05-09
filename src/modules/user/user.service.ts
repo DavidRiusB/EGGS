@@ -62,8 +62,8 @@ export class UserService {
     return me;
   }
 
-  async update(id: number, userData: UserUpdateDto, user: User): Promise<User> {
-    const target = await this.findUserById(id, user);
+  async update(userData: UserUpdateDto, user: User): Promise<User> {
+    const target = await this.findUserById(user.id, user);
 
     Object.assign(target, userData);
 
