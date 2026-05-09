@@ -28,13 +28,9 @@ export class AddressController {
     return this.addressService.findUserAddresses(id, user);
   }
 
-  @Post('user/:id')
-  async registerAddress(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: AddressDto,
-    @CurrentUser() user,
-  ) {
-    return await this.addressService.createAddress(data, id, user);
+  @Post()
+  async registerAddress(@Body() data: AddressDto, @CurrentUser() user) {
+    return await this.addressService.createAddress(data, user);
   }
 
   @Patch(':id')

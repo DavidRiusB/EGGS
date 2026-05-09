@@ -28,19 +28,10 @@ export class AddressService {
     return await this.addressRepository.getUserAddresses(id);
   }
 
-  async createAddress(data: AddressDto, id: number, userAuth: User) {
-    if (userAuth.role !== Role.Admin && userAuth.id !== id) {
-      // admin can create addresses ?
-      throw new ForbiddenException('You can only access your own addresses');
-    }
-
+  async createAddress(data: AddressDto, userAuth: User) {
     return await this.dataSource.transaction(async (manager) => {
       // find user
-      const user = await this.userRepository.findById(id, manager);
-
-      if (!user) {
-        throw new NotFoundException(`User with id ${id} not found`);
-      }
+      const id = userAuth.id;
 
       // enforce primary rules
       if (data.isPrimary) {
@@ -53,7 +44,7 @@ export class AddressService {
         }
       }
 
-      return await this.addressRepository.create(data, user, manager);
+      return await this.addressRepository.create(data, userAuth, manager);
     });
   }
 
