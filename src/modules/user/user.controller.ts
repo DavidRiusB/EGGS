@@ -45,6 +45,11 @@ export class UserController {
     return this.userService.findByTelephone(telephone);
   }
 
+  @Get('me')
+  async getMe(@CurrentUser() user) {
+    return this.userService.findMe(user.id);
+  }
+
   @Get(':id')
   async getUserById(
     @Param('id', ParseIntPipe) id: number,

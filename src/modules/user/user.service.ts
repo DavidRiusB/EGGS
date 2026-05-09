@@ -54,6 +54,14 @@ export class UserService {
     return user;
   }
 
+  async findMe(id: number) {
+    const me = await this.userRepository.findByIdWithPrimaryAddress(id);
+    if (!me) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return me;
+  }
+
   async update(id: number, userData: UserUpdateDto, user: User): Promise<User> {
     const target = await this.findUserById(id, user);
 
