@@ -4,8 +4,8 @@ import { Appointment } from './entity/appointment.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 import { FindAppointmentsDto } from './dto/find-appointments.dto';
 import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
-import { AvailabilityDay } from './types/availability.types';
 import { AppointmentSlot } from 'src/common/enums/appointment-slot.enum';
+import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class AppointmentsRepository {
@@ -119,5 +119,15 @@ export class AppointmentsRepository {
       .getMany();
 
     return query;
+  }
+
+  // In AppointmentsRepository
+  async create(
+    data: Partial<Appointment>,
+    manager?: EntityManager,
+  ): Promise<Appointment> {
+    const repo = this.getRepo(manager);
+    const appointment = repo.create(data);
+    return repo.save(appointment);
   }
 }

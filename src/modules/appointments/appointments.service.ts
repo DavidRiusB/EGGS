@@ -34,67 +34,48 @@ export class AppointmentsService {
     data: CreateAppointmentDto,
     userAuth: User,
   ): Promise<Appointment> {
-    const { date, slot, userId, repairId, notes } = data;
+    const { date, slot, userId, notes } = data;
 
-    // 🔒 Permission logic (strict, no silent fallback)
+    // 🔒 Permission logic
     let targetUserId: number;
 
-    if (userAuth.role !== Role.Admin) {
-      // Normal user
-
-      // ❌ Trying to spoof another user
-      if (userId && userId !== userAuth.id) {
-        throw new ForbiddenException(
-          'You can only create appointments for your own user',
-        );
-      }
-
-      // ✅ Always use auth user
-      targetUserId = userAuth.id;
-    } else {
-      // Admin
-
+    if (userAuth.role === Role.Admin) {
       if (!userId) {
         throw new BadRequestException(
           'Admin must provide a userId to create an appointment',
         );
       }
-
       targetUserId = userId;
+    } else {
+      if (userId && userId !== userAuth.id) {
+        throw new ForbiddenException(
+          'You can only create appointments for your own user',
+        );
+      }
+      targetUserId = userAuth.id;
     }
 
+    // 🔹 Validate user has an address (no transaction needed for reads)
+    const user =
+      await this.userRepository.findByIdWithPrimaryAddress(targetUserId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id: ${targetUserId} not found`);
+    }
+
+    if (!user.addresses?.length) {
+      throw new BadRequestException(
+        'You must add an address to your profile before booking',
+      );
+    }
+
+    // 🔹 Create appointment
     try {
-      return await this.dataSource.transaction(async (manager) => {
-        // 🔹 1. Validate user
-        const user = await this.userRepository.findById(targetUserId, manager);
-
-        if (!user) {
-          throw new NotFoundException(
-            `User with id: ${targetUserId} not found`,
-          );
-        }
-
-        // 🔹 2. Validate repair (optional)
-        const repair =
-          repairId !== undefined
-            ? await this.repairRepository.findById(repairId, manager)
-            : undefined;
-
-        if (repairId && !repair) {
-          throw new NotFoundException(`Repair with id: ${repairId} not found`);
-        }
-
-        // 🔹 3. Create appointment
-        const appointment = manager.create(Appointment, {
-          date,
-          slot,
-          user,
-          repair: repair ?? undefined,
-          notes,
-        });
-
-        // 🔹 4. Save
-        return await manager.save(appointment);
+      return await this.appointmentsRepository.create({
+        date,
+        slot,
+        user,
+        notes,
       });
     } catch (error: any) {
       if (error.code === '23505') {
@@ -102,7 +83,6 @@ export class AppointmentsService {
           `The slot ${slot} on ${date} is already booked`,
         );
       }
-
       throw error;
     }
   }
