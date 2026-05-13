@@ -54,6 +54,17 @@ export class UserService {
     return user;
   }
 
+  async findByUserInfo(userInfo: string) {
+    if (!userInfo || userInfo.trim().length < 2) return [];
+    if (userInfo.includes('@')) {
+      return this.userRepository.findByEmailLike(userInfo);
+    }
+    if (/^\d+$/.test(userInfo)) {
+      return this.userRepository.findByPhoneLike(userInfo);
+    }
+    return this.userRepository.findByNameLike(userInfo);
+  }
+
   async findMe(id: number) {
     const me = await this.userRepository.findByIdWithPrimaryAddress(id);
     if (!me) {

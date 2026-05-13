@@ -45,6 +45,13 @@ export class UserController {
     return this.userService.findByTelephone(telephone);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
+  @Get('search')
+  async searchUsers(@Query('q') q: string) {
+    return this.userService.findByUserInfo(q);
+  }
+
   @Get('me')
   async getMe(@CurrentUser() user) {
     return this.userService.findMe(user.id);

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AddressSuffix } from 'src/common/enums/address-suffixes.enum';
 import { CardinalDirection } from 'src/common/enums/cardinal-directions.enum';
 import { ProductType } from 'src/common/enums/product-type.enum';
+import { Role } from 'src/common/enums/roles.enum';
 import { State } from 'src/common/enums/states.enums';
 import { hashPassword } from 'src/common/utils/hashing/bycryp.utils';
 import { Address } from 'src/modules/address/entity/address.entity';
@@ -19,7 +20,7 @@ export class SeedService {
     this.logger.log('Starting database seeding...');
 
     await this.dataSource.transaction(async (manager) => {
-      const user = await this.seedUsers(manager);
+      const { user, admin } = await this.seedUsers(manager);
       await this.seedAddresses(manager, user);
       await this.seedProducts(manager);
     });
@@ -27,42 +28,110 @@ export class SeedService {
     this.logger.log('Seeding completed.');
   }
 
-  private async seedUsers(manager: EntityManager): Promise<User> {
+  private async seedUsers(
+    manager: EntityManager,
+  ): Promise<{ user: User; admin: User }> {
     this.logger.log('Seeding users...');
 
     const userRepository = manager.getRepository(User);
-    const credentialRepository = manager.getRepository(Credential);
 
     const existingUsers = await userRepository.count();
     if (existingUsers > 0) {
       this.logger.log('Users already seeded');
 
-      return await userRepository.findOneOrFail({
+      const user = await userRepository.findOneOrFail({
         where: { email: 'test@example.com' },
       });
+      const admin = await userRepository.findOneOrFail({
+        where: { email: 'admin@example.com' },
+      });
+      return { user, admin };
     }
 
-    const user = userRepository.create({
-      firstName: 'Test',
-      lastName: 'User',
-      email: 'test@example.com',
-      telephone: '123456789',
-    });
+    // Regular user (used for address seed + as the main test customer)
+    const user = await this.createUserWithCredentials(
+      manager,
+      {
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        telephone: '123456789',
+        role: Role.User,
+      },
+      '12345678',
+    );
 
+    // Admin user
+    const admin = await this.createUserWithCredentials(
+      manager,
+      {
+        firstName: 'Admin',
+        lastName: 'User',
+        email: 'admin@example.com',
+        telephone: '987654321',
+        role: Role.Admin,
+      },
+      'admin12345',
+    );
+
+    // Extra users for testing search
+    const extras = [
+      {
+        firstName: 'John',
+        lastName: 'Smith',
+        email: 'john.smith@example.com',
+        telephone: '5551234567',
+      },
+      {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com',
+        telephone: '5559876543',
+      },
+      {
+        firstName: 'Bob',
+        lastName: 'Jones',
+        email: 'bob.jones@example.com',
+        telephone: '5551112222',
+      },
+      {
+        firstName: 'Alice',
+        lastName: 'Johnson',
+        email: 'alice.j@example.com',
+        telephone: '5553334444',
+      },
+    ];
+
+    for (const data of extras) {
+      await this.createUserWithCredentials(
+        manager,
+        { ...data, role: Role.User },
+        'password123',
+      );
+    }
+
+    this.logger.log('Users seed executed.');
+
+    return { user, admin };
+  }
+
+  private async createUserWithCredentials(
+    manager: EntityManager,
+    userData: Partial<User>,
+    plainPassword: string,
+  ): Promise<User> {
+    const userRepository = manager.getRepository(User);
+    const credentialRepository = manager.getRepository(Credential);
+
+    const user = userRepository.create(userData);
     const savedUser = await userRepository.save(user);
-
-    const password = '12345678';
-    const hashedPassword = await hashPassword(password);
 
     const credential = credentialRepository.create({
       email: savedUser.email,
-      password: hashedPassword,
+      password: await hashPassword(plainPassword),
       user: savedUser,
     });
-
     await credentialRepository.save(credential);
-
-    this.logger.log('Users seed executed.');
 
     return savedUser;
   }

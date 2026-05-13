@@ -15,6 +15,10 @@ export class UserRepository {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  private getRepo(manager?: EntityManager): Repository<User> {
+    return manager ? manager.getRepository(User) : this.userRepository;
+  }
+
   async findAll(pagination: {
     page: number;
     limit: number;
@@ -105,5 +109,37 @@ export class UserRepository {
 
   async softDelete(id: number): Promise<DeleteResult> {
     return this.userRepository.softDelete(id);
+  }
+
+  async findByEmailLike(q: string, manager?: EntityManager): Promise<User[]> {
+    const repo = this.getRepo(manager);
+    return repo
+      .createQueryBuilder('user')
+      .where('user.email ILIKE :q', { q: `%${q}%` })
+      .orderBy('user.email', 'ASC')
+      .limit(20)
+      .getMany();
+  }
+
+  async findByPhoneLike(q: string, manager?: EntityManager): Promise<User[]> {
+    const repo = this.getRepo(manager);
+    return repo
+      .createQueryBuilder('user')
+      .where('user.telephone ILIKE :q', { q: `%${q}%` })
+      .orderBy('user.telephone', 'ASC')
+      .limit(20)
+      .getMany();
+  }
+
+  async findByNameLike(q: string, manager?: EntityManager): Promise<User[]> {
+    const repo = this.getRepo(manager);
+    return repo
+      .createQueryBuilder('user')
+      .where('user.firstName ILIKE :q', { q: `%${q}%` })
+      .orWhere('user.lastName ILIKE :q', { q: `%${q}%` })
+      .orderBy('user.firstName', 'ASC')
+      .addOrderBy('user.lastName', 'ASC')
+      .limit(20)
+      .getMany();
   }
 }
