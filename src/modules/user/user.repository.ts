@@ -39,6 +39,20 @@ export class UserRepository {
     return repo.findOne({ where: { id } });
   }
 
+  async findByIdWithDetails(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<User | null> {
+    const repo = manager ? manager.getRepository(User) : this.userRepository;
+    return repo.findOne({
+      where: { id },
+      relations: ['addresses', 'appointments'],
+      order: {
+        appointments: { date: 'DESC' },
+      },
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { email } });
   }

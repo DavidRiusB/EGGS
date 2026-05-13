@@ -20,6 +20,14 @@ export class UserService {
     return this.userRepository.findAll(pagination);
   }
 
+  async findUserByIdWithDetails(id: number): Promise<User> {
+    const target = await this.userRepository.findByIdWithDetails(id);
+    if (!target) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return target;
+  }
+
   async findUserById(id: number, user: User): Promise<User> {
     const target = await this.userRepository.findById(id);
 
@@ -56,6 +64,7 @@ export class UserService {
 
   async findByUserInfo(userInfo: string) {
     if (!userInfo || userInfo.trim().length < 2) return [];
+
     if (userInfo.includes('@')) {
       return this.userRepository.findByEmailLike(userInfo);
     }

@@ -62,7 +62,7 @@ export class UserController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user,
   ) {
-    return this.userService.findUserById(id, user);
+    return this.userService.findUserByIdWithDetails(id);
   }
 
   @Patch('me')
