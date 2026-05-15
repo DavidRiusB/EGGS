@@ -16,6 +16,9 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { GetAvailabilityDto } from './dto/get-availability.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/enums/roles.enum';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -51,17 +54,15 @@ export class AppointmentsController {
     return this.appointmentsService.createAppointment(data, user);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Patch(':id')
   async updateAppointment(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: any,
-    @CurrentUser() user,
+    @Body() data: UpdateAppointmentDto,
   ) {
-    return this.appointmentsService.updateAppointment(id, data, user);
-
-    // missing
+    return this.appointmentsService.updateAppointment(id, data);
   }
-
   @Patch(':id/cancel')
   async cancelAppointment(
     @Param('id', ParseIntPipe) id: number,

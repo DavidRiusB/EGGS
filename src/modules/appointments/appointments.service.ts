@@ -16,6 +16,7 @@ import { User } from '../user/entity/user.entity';
 import { Role } from 'src/common/enums/roles.enum';
 import { AvailabilityDay } from './types/availability.types';
 import { AppointmentSlot } from 'src/common/enums/appointment-slot.enum';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @Injectable()
 export class AppointmentsService {
@@ -26,8 +27,16 @@ export class AppointmentsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  updateAppointment(id: number, data: any, user) {
-    throw new Error('Method not implemented.');
+  async updateAppointment(
+    id: number,
+    data: UpdateAppointmentDto,
+  ): Promise<Appointment> {
+    const appointment = await this.appointmentsRepository.getById(id);
+    if (!appointment) {
+      throw new NotFoundException(`Appointment ${id} not found`);
+    }
+    Object.assign(appointment, data);
+    return this.appointmentsRepository.update(appointment);
   }
 
   async createAppointment(

@@ -92,11 +92,16 @@ export class AppointmentsRepository {
     manager?: EntityManager,
   ): Promise<Appointment | null> {
     const repo = this.getRepo(manager);
-
-    return repo.findOne({
-      where: { id },
-      relations: ['user', 'repair'],
-    });
+    return repo
+      .createQueryBuilder('appointment')
+      .leftJoinAndSelect('appointment.user', 'user')
+      .leftJoinAndSelect(
+        'user.addresses',
+        'address',
+        'address.isPrimary = true',
+      )
+      .where('appointment.id = :id', { id })
+      .getOne();
   }
 
   async softDelete(id: number, manager?: EntityManager): Promise<DeleteResult> {
@@ -128,6 +133,14 @@ export class AppointmentsRepository {
   ): Promise<Appointment> {
     const repo = this.getRepo(manager);
     const appointment = repo.create(data);
+    return repo.save(appointment);
+  }
+
+  async update(
+    appointment: Appointment,
+    manager?: EntityManager,
+  ): Promise<Appointment> {
+    const repo = this.getRepo(manager);
     return repo.save(appointment);
   }
 }

@@ -57,6 +57,8 @@ export class UserController {
     return this.userService.findMe(user.id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Get(':id')
   async getUserById(
     @Param('id', ParseIntPipe) id: number,
