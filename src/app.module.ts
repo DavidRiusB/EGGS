@@ -14,6 +14,7 @@ import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { MailModule } from './modules/mail/mail.module';
+import { TokenController } from './modules/token/token.controller';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { MailModule } from './modules/mail/mail.module';
     AppointmentsModule,
     MailModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, TokenController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

@@ -123,7 +123,7 @@ export class SeedService {
     const userRepository = manager.getRepository(User);
     const credentialRepository = manager.getRepository(Credential);
 
-    const user = userRepository.create(userData);
+    const user = userRepository.create({ ...userData, verified: true });
     const savedUser = await userRepository.save(user);
 
     const credential = credentialRepository.create({

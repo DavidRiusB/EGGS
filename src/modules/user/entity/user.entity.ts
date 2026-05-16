@@ -13,6 +13,7 @@ import { Address } from 'src/modules/address/entity/address.entity';
 import { Repair } from 'src/modules/repairs/entity/repairs.entity';
 import { Credential } from 'src/modules/auth/entities/auth.entity';
 import { Appointment } from 'src/modules/appointments/entity/appointment.entity';
+import { Token } from 'src/modules/token/entity/token.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -37,6 +38,9 @@ export class User {
 
   @Column({ length: 20 })
   telephone: string;
+
+  @Column({ type: 'boolean', default: false })
+  verified: boolean;
 
   @OneToMany(() => Address, (address) => address.user)
   addresses: Address[];
