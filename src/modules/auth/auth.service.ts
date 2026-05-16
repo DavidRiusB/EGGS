@@ -13,6 +13,10 @@ import {
   validateUserPassword,
 } from 'src/common/utils/hashing/bycryp.utils';
 import { LoginUserDto } from './dto/login.dto';
+import { TokenService } from '../token/token.service';
+import { MailService } from '../mail/mail.service';
+import { TokenType } from 'src/common/enums/token-type.enum';
+import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -21,11 +25,16 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(data: RegisterUserDto) {
+    let plainToken: string;
+    let createdUser: User;
+
     try {
-      return await this.dataSource.transaction(async (manager) => {
+      const result = await this.dataSource.transaction(async (manager) => {
         const hashedPassword = await hashPassword(data.password);
 
         const user = await this.userRepository.create(data, manager);
@@ -39,11 +48,37 @@ export class AuthService {
           manager,
         );
 
-        return user;
+        const token = await this.tokenService.createToken(
+          user,
+          TokenType.EMAIL_VERIFICATION,
+          60 * 24, // 24h TTL
+          manager,
+        );
+
+        return { user, token };
       });
+
+      createdUser = result.user;
+      plainToken = result.token;
     } catch (error) {
       throw new BadRequestException(error);
     }
+
+    // ---- After commit: send the email (fire-and-forget) ----
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3001';
+    const verifyUrl = `${frontendUrl}/verify-email?token=${plainToken}`;
+
+    await this.mailService.sendMail({
+      to: createdUser.email,
+      subject: 'Verify your email',
+      template: 'verify-email',
+      context: {
+        name: createdUser.firstName,
+        verifyUrl,
+      },
+    });
+
+    return createdUser;
   }
 
   async signIn(credentials: LoginUserDto) {

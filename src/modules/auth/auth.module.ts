@@ -10,6 +10,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { MailModule } from '../mail/mail.module';
+import { TokenModule } from '../token/token.module';
+import { TokenService } from '../token/token.service';
 
 @Global()
 @Module({
@@ -17,7 +19,7 @@ import { MailModule } from '../mail/mail.module';
     TypeOrmModule.forFeature([Credential]),
 
     JwtModule.registerAsync({
-      imports: [ConfigModule], // 👈 ensures config is available
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -26,6 +28,8 @@ import { MailModule } from '../mail/mail.module';
     }),
 
     UserModule,
+    TokenModule,
+    MailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, AuthRepository, JwtStrategy],

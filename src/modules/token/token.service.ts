@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { randomBytes, createHash } from 'crypto';
 import { Token } from './entity/token.entity';
 import { TokenType } from 'src/common/enums/token-type.enum';
@@ -13,22 +13,21 @@ export class TokenService {
     private readonly tokenRepository: Repository<Token>,
   ) {}
 
+  private getRepo(manager?: EntityManager): Repository<Token> {
+    return manager ? manager.getRepository(Token) : this.tokenRepository;
+  }
+
   private hash(token: string): string {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  /**
-   * Creates a token for a user. Returns the PLAINTEXT token
-   * (to put in the email link). Only the hash is stored.
-   */
   async createToken(
     user: User,
     type: TokenType,
     ttlMinutes: number,
+    manager?: EntityManager,
   ): Promise<string> {
-    // Invalidate any existing active tokens of this type for this user
-    // so old links stop working when a new one is issued.
-    await this.invalidateActiveTokens(user.id, type);
+    await this.invalidateActiveTokens(user.id, type, manager);
 
     const plainToken = randomBytes(32).toString('hex');
     const tokenHash = this.hash(plainToken);
@@ -36,29 +35,28 @@ export class TokenService {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + ttlMinutes);
 
-    const tokenEntity = this.tokenRepository.create({
+    const repo = this.getRepo(manager);
+    const tokenEntity = repo.create({
       tokenHash,
       type,
       user,
       expiresAt,
       usedAt: null,
     });
-    await this.tokenRepository.save(tokenEntity);
+    await repo.save(tokenEntity);
 
     return plainToken;
   }
 
-  /**
-   * Validates a plaintext token. Returns the Token row (with user)
-   * if valid, or null if invalid/expired/used.
-   */
   async validateToken(
     plainToken: string,
     type: TokenType,
+    manager?: EntityManager,
   ): Promise<Token | null> {
     const tokenHash = this.hash(plainToken);
+    const repo = this.getRepo(manager);
 
-    const token = await this.tokenRepository.findOne({
+    const token = await repo.findOne({
       where: { tokenHash, type },
       relations: ['user'],
     });
@@ -70,20 +68,18 @@ export class TokenService {
     return token;
   }
 
-  /**
-   * Marks a token as consumed. Single-use enforcement.
-   */
-  async consumeToken(token: Token): Promise<void> {
+  async consumeToken(token: Token, manager?: EntityManager): Promise<void> {
     token.usedAt = new Date();
-    await this.tokenRepository.save(token);
+    await this.getRepo(manager).save(token);
   }
 
-  /**
-   * Invalidates all active tokens of a type for a user.
-   * Used before issuing a new one (resend).
-   */
-  async invalidateActiveTokens(userId: number, type: TokenType): Promise<void> {
-    await this.tokenRepository
+  async invalidateActiveTokens(
+    userId: number,
+    type: TokenType,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const repo = this.getRepo(manager);
+    await repo
       .createQueryBuilder()
       .update(Token)
       .set({ usedAt: new Date() })
