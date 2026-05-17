@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -16,6 +17,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { VerifyEmailDto } from '../token/dto/verify-email.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from '../user/entity/user.entity';
+import { ChangeEmailDto } from './dto/change-email.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -85,5 +87,11 @@ export class AuthController {
   @Post('resend-verification')
   async resendVerification(@CurrentUser() user: User) {
     return this.authService.resendVerification(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('change-email')
+  async changeEmail(@CurrentUser() user: User, @Body() dto: ChangeEmailDto) {
+    return this.authService.changeEmail(user, dto.email);
   }
 }

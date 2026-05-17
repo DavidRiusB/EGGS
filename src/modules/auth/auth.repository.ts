@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credential } from './entities/auth.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -44,5 +40,22 @@ export class AuthRepository {
       select: ['id', 'email', 'password'],
       relations: ['user'],
     });
+  }
+
+  async updateEmailByUserId(
+    userId: number,
+    newEmail: string,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const repo = manager
+      ? manager.getRepository(Credential)
+      : this.credentialRepository;
+
+    await repo
+      .createQueryBuilder()
+      .update(Credential)
+      .set({ email: newEmail })
+      .where('userId = :userId', { userId })
+      .execute();
   }
 }

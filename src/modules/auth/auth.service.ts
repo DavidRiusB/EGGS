@@ -180,4 +180,62 @@ export class AuthService {
 
     return { sent: true };
   }
+
+  // in AuthService
+  async changeEmail(user: User, newEmail: string): Promise<{ sent: true }> {
+    // 1. Verified users cannot change email via this path.
+    if (user.verified) {
+      throw new BadRequestException(
+        'Email cannot be changed after verification',
+      );
+    }
+
+    // 2. No-op if unchanged (don't re-trigger verification needlessly).
+    if (newEmail === user.email) {
+      throw new BadRequestException('That is already your email');
+    }
+
+    let plainToken: string;
+
+    try {
+      plainToken = await this.dataSource.transaction(async (manager) => {
+        // Update User.email
+        user.email = newEmail;
+        await this.userRepository.update(user, manager);
+
+        // Sync Credential.email (login key) — MUST stay in sync
+        await this.authRepository.updateEmailByUserId(
+          user.id,
+          newEmail,
+          manager,
+        );
+
+        // Issue a fresh verification token (auto-invalidates prior)
+        return this.tokenService.createToken(
+          user,
+          TokenType.EMAIL_VERIFICATION,
+          60 * 24,
+          manager,
+        );
+      });
+    } catch (error: any) {
+      if (error.code === '23505') {
+        throw new BadRequestException('That email is already in use');
+      }
+      throw new BadRequestException(error);
+    }
+
+    // After commit: send verification to the NEW address
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3001';
+    const verifyUrl = `${frontendUrl}/verify-email?token=${plainToken}`;
+
+    await this.mailService.sendMail({
+      to: newEmail,
+      subject: 'Verify your email',
+      template: 'verify-email',
+      context: { name: user.firstName, verifyUrl },
+    });
+
+    return { sent: true };
+  }
 }

@@ -72,6 +72,10 @@ export class AppointmentsService {
       throw new NotFoundException(`User with id: ${targetUserId} not found`);
     }
 
+    if (!user.verified) {
+      throw new BadRequestException('Please verify your email before booking');
+    }
+
     if (!user.addresses?.length) {
       throw new BadRequestException(
         'You must add an address to your profile before booking',
