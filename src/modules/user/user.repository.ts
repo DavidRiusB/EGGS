@@ -77,14 +77,14 @@ export class UserRepository {
       .getOne();
   }
 
-  async update(user: User): Promise<User> {
+  async update(user: User, manager?: EntityManager): Promise<User> {
+    const repo = this.getRepo(manager);
     try {
-      return await this.userRepository.save(user);
+      return await repo.save(user);
     } catch (error) {
       if (error.code === '23505') {
         throw new BadRequestException('User with provided data already exists');
       }
-
       throw new InternalServerErrorException(
         'Unexpected error while updating user',
       );

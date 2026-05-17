@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   Res,
@@ -12,7 +13,9 @@ import { RegisterUserDto } from './dto/register.dto';
 import { LoginUserDto } from './dto/login.dto';
 import type { Response, Request } from 'express';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { MailService } from '../mail/mail.service';
+import { VerifyEmailDto } from '../token/dto/verify-email.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { User } from '../user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -71,5 +74,16 @@ export class AuthController {
     });
 
     return { success: true };
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto.token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  async resendVerification(@CurrentUser() user: User) {
+    return this.authService.resendVerification(user);
   }
 }
