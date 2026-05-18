@@ -18,6 +18,8 @@ import { VerifyEmailDto } from '../token/dto/verify-email.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { User } from '../user/entity/user.entity';
 import { ChangeEmailDto } from './dto/change-email.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -93,5 +95,15 @@ export class AuthController {
   @Patch('change-email')
   async changeEmail(@CurrentUser() user: User, @Body() dto: ChangeEmailDto) {
     return this.authService.changeEmail(user, dto.email);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 }

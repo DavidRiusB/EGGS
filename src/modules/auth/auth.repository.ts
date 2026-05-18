@@ -58,4 +58,21 @@ export class AuthRepository {
       .where('userId = :userId', { userId })
       .execute();
   }
+
+  async updatePasswordByUserId(
+    userId: number,
+    hashedPassword: string,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const repo = manager
+      ? manager.getRepository(Credential)
+      : this.credentialRepository;
+
+    await repo
+      .createQueryBuilder()
+      .update(Credential)
+      .set({ password: hashedPassword })
+      .where('userId = :userId', { userId })
+      .execute();
+  }
 }

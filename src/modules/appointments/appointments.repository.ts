@@ -4,8 +4,6 @@ import { Appointment } from './entity/appointment.entity';
 import { DeleteResult, EntityManager, Repository } from 'typeorm';
 import { FindAppointmentsDto } from './dto/find-appointments.dto';
 import { AppointmentStatus } from 'src/common/enums/appointment-status.enum';
-import { AppointmentSlot } from 'src/common/enums/appointment-slot.enum';
-import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class AppointmentsRepository {
